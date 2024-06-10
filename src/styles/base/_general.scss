@@ -1,0 +1,32 @@
+:root {
+    font-family: $ff-main;
+    line-height: 1.5;
+    font-weight: 400;
+    color: $c-text;
+    font-variant-numeric: lining-nums proportional-nums;
+}
+h1, h2, h3, h4, h5, h6, ul, p, span {
+    margin: 0;
+    padding: 0;
+	letter-spacing: inherit;
+	line-height: inherit;
+	font-size: inherit;
+	font-family: inherit;
+	color: inherit;
+}
+html {
+    height: 100%;
+	font-size: 16px;
+	line-height: 1.5em;
+    scroll-behavior: smooth;
+}
+body {
+    margin: 0;
+    min-width: 320px;
+    width: 100%;
+    min-height: 100vh;
+    * {
+        box-sizing: border-box;
+    }
+
+}

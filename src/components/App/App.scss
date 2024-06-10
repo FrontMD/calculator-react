@@ -1,0 +1,50 @@
+#root {
+  width: 100%;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+.calculator {
+  padding: 70px 0;
+  &__title {
+    font-size: 50px;
+    line-height: 1.1;
+  }
+  &__form {
+    margin-top: 50px;
+    max-width: 350px;
+  }
+  &__results {
+    margin-top: 50px;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  input, select {
+      padding: 15px 20px;
+      width: 100%;
+      outline: none;
+      border: 1px solid lightgrey;
+  }
+}
+
+.form-field {
+  &.error input,
+  &.error select {
+      border-color: red;
+  }
+}
