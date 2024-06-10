@@ -1,4 +1,8 @@
+import {Chart as ChartJS} from 'chart.js/auto'
+import {Bar, Line, Pie} from 'react-chartjs-2'
 import './Results.scss'
+
+ChartJS.register();
 
 export default function Results({ payments, classes }) {
     return (
@@ -17,9 +21,9 @@ export default function Results({ payments, classes }) {
                             return (
                                 <div className="schedule-table__row" key={paypent.month}>
                                     <div className="schedule-table__col schedule-table__col--month schedule-table__text">{paypent.month}</div>
-                                    <div className="schedule-table__col schedule-table__text">{paypent.currentDebt + ' руб.'}</div>
-                                    <div className="schedule-table__col schedule-table__text">{paypent.summ + ' руб.'}</div>
-                                    <div className="schedule-table__col schedule-table__col--Interest schedule-table__text">{paypent.interestСharges + ' руб.'}</div>
+                                    <div className="schedule-table__col schedule-table__text">{paypent.currentDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' руб.'}</div>
+                                    <div className="schedule-table__col schedule-table__text">{paypent.summ.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' руб.'}</div>
+                                    <div className="schedule-table__col schedule-table__col--Interest schedule-table__text">{paypent.interestСharges.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' руб.'}</div>
                                 </div>
                             )
                         })
@@ -29,6 +33,70 @@ export default function Results({ payments, classes }) {
             </div>
             <div className="diagram">
                 <h2 className='results__title'> Диаграмма платежей </h2>
+                <div className="diagram__container">
+                    <Bar
+                        data={
+                            {
+                                labels: payments.map(payment => payment.month),
+                                datasets: [
+                                    {
+                                        label: "Основной долг",
+                                        data: payments.map(payment => parseFloat(payment.currentDebt))
+                                    },
+                                    {
+                                        label: "Проценты",
+                                        data: payments.map(payment => parseFloat(payment.interestСharges))
+                                    }
+                                ]
+                            }
+                        }
+                        options={
+                            {
+                                scales: {
+                                    x: {
+                                    stacked: true,
+                                    },
+                                    y: {
+                                    stacked: true,
+                                    },
+                                },
+                            }
+                        }  
+                    />
+                    <Line
+                        data={
+                            {
+                                labels: payments.map(payment => payment.month),
+                                datasets: [
+                                    {
+                                        label: "Основной долг",
+                                        data: payments.map(payment => payment.currentDebt)
+                                    },
+                                    {
+                                        label: "Проценты",
+                                        data: payments.map(payment => payment.interestСharges)
+                                    }
+                                ]
+                            }
+                        }
+                    />
+                    <Pie
+                        data={
+                            {
+                                labels: ["Основной долг", "Проценты"],
+                                datasets: [
+                                    {
+                                        label: "a",
+                                        data: [
+                                            payments[0].currentDebt,
+                                            payments.reduce((acc, payment) => acc + payment.interestСharges, 0),
+                                        ]
+                                    },
+                                ]
+                            }
+                        }
+                    />
+                </div>
             </div>
         </div>
     )

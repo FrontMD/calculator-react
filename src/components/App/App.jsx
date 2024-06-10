@@ -50,7 +50,7 @@ export default function App() {
 	function amountOfCreditChange(event) {
 		let currentValue = event.target.value.replace(/\D/g, '');
 
-		setAmountOfCredit(currentValue);
+		setAmountOfCredit(currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "));
 
 		if(currentValue.length < 1) {
 			setAmountOfCreditError(true)
