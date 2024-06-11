@@ -9,41 +9,46 @@ let styles = {
     container: {
         maxWidth: '1440px',
         margin: '0 auto',
-        padding: '0 30px'
+        padding: '0 30px',
+        boxSizing: 'border-box'
 
     },
     calculator: {
         padding: '70px 0',
-
+        boxSizing: 'border-box',
         backgroundColor: 'white'
     },
     calculatorTitle: {
         fontSize: '50px',
-        lineHeight: '1.1'
+        lineHeight: '1.1',
+        boxSizing: 'border-box'
     },
     calculatorForm: {
         marginTop: '50px',
         maxWidth: '350px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px'
+        gap: '20px',
+        boxSizing: 'border-box'
     },
     formField: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px'
+        gap: '10px',
+        boxSizing: 'border-box'
     },
     inputAndSelect: {
         padding: '15px 20px',
         width: '100%',
         outline: 'none',
-        border: '1px solid lightgrey'
+        border: '1px solid lightgrey',
+        boxSizing: 'border-box'
     },
     inputAndSelectError: {
         padding: '15px 20px',
         width: '100%',
         outline: 'none',
-        border: '1px solid red'
+        border: '1px solid red',
     },
     btn: {
         padding: '15px 30px',
@@ -55,7 +60,8 @@ let styles = {
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
-        transition: 'background-color 0.2s ease'
+        transition: 'background-color 0.2s ease',
+        boxSizing: 'border-box'
     },
 
     calculatorResults: {
@@ -64,16 +70,19 @@ let styles = {
         alignItems: 'flex-start',
         justifyContent: 'space-between',
         flexDirection: 'row',
-        gap: '50px'
+        gap: '50px',
+        boxSizing: 'border-box'
     },
     
     resultsTitle: {
         fontSize: '35px',
-        lineHeight: '1.1'
+        lineHeight: '1.1',
+        boxSizing: 'border-box'
     },
     
     schedule: {
-        flex: '0 0 650px'
+        flex: '0 0 650px',
+        boxSizing: 'border-box'
     },
         
     scheduleTable: {
@@ -82,13 +91,15 @@ let styles = {
         fontWeight: '400',
         borderTop: '1px solid lightgrey',
         width: '100%',
-        marginTop: '30px'
+        marginTop: '30px',
+        boxSizing: 'border-box'
     },
 
     tableRow: {
         display: 'flex',
         alignItems: 'stretch',
-        borderLeft: '1px solid lightgrey'
+        borderLeft: '1px solid lightgrey',
+        boxSizing: 'border-box'
     },
 
     tableCol: {
@@ -98,6 +109,7 @@ let styles = {
         flexBasis: '30%',
         borderRight: '1px solid lightgrey',
         borderBottom: '1px solid lightgrey',
+        boxSizing: 'border-box'
     },
 
     tableColMonth: {
@@ -107,6 +119,7 @@ let styles = {
         flexBasis: '16%',
         borderRight: '1px solid lightgrey',
         borderBottom: '1px solid lightgrey',
+        boxSizing: 'border-box'
     },
 
     tableColInterest: {
@@ -116,23 +129,27 @@ let styles = {
         flexBasis: '24%',
         borderRight: '1px solid lightgrey',
         borderBottom: '1px solid lightgrey',
+        boxSizing: 'border-box'
     },
 
     tableTitle: {
-        fontWeight: '700'
+        fontWeight: '700',
+        boxSizing: 'border-box'
     },
     
     diagram: {
         flexBasis: 'auto',
         flexGrow: '1',
-        flexShrink: '1'
+        flexShrink: '1',
+        boxSizing: 'border-box'
     },
 
     diagramContainer: {
         display: 'flex',
         flexDirection: 'column',
         gap: '40px',
-        marginTop: '30px'
+        marginTop: '30px',
+        boxSizing: 'border-box'
     }
 }
 

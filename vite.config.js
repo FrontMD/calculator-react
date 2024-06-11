@@ -5,11 +5,11 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/calculator-react/',
   plugins: [react()],
-  css: {
+  /*css: {
     preprocessorOptions: {
       scss: {
         additionalData: `@import "src/styles/helpers/_variables.scss";`
       }
     }
-  },
+  },*/
 })
