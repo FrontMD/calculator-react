@@ -1,4 +1,4 @@
-import data from "../data/data.json"
+/*import data from "../data/data.json"
 
 export default function calculate() {
     let amountOfCreditVal = parseFloat(amountOfCredit.value.replace(/\s/g, ''));
@@ -28,4 +28,4 @@ export default function calculate() {
 
     return payments;
 
-}
+}*/

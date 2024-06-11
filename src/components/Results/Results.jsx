@@ -1,4 +1,4 @@
-import {Chart as ChartJS} from 'chart.js/auto'
+/*import {Chart as ChartJS} from 'chart.js/auto'
 import {Bar, Line, Pie} from 'react-chartjs-2'
 import './Results.scss'
 
@@ -100,4 +100,4 @@ export default function Results({ payments, classes }) {
             </div>
         </div>
     )
-}
+}*/
