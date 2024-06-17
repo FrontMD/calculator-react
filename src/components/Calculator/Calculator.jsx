@@ -1,9 +1,52 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import {Chart as ChartJS} from 'chart.js/auto'
-import {Bar, Line, Pie} from 'react-chartjs-2'
+import {Bar, Line} from 'react-chartjs-2'
 
 ChartJS.register();
+
+// Хук для двусторонней связи полей
+
+function useInput(initialValue, type = '') {
+    const [value, setValue] = useState(initialValue);
+    const [error, setError] = useState(false)
+
+    function onChange(event) {
+        
+        if(type === 'float') {
+            let currentValue = event.target.value.replace(/[^\.\d]/g, '');
+            
+            setValue(currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "))
+    
+            if(currentValue.length < 1) {
+                setError(true)
+            } else {
+                setError(false)
+            }
+
+        } else if(type === 'int') {
+            let currentValue = event.target.value.replace(/\D/g, '');
+
+            setValue(currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "));
+
+            if(currentValue.length < 1) {
+                setError(true)
+            } else {
+                setError(false)
+            }
+        } else {
+            let currentValue = event.target.value;
+            setValue(currentValue);
+        }
+    }
+
+
+    return {
+        value, error, onChange
+    }
+}
+
+// стили
 
 let styles = {
     container: {
@@ -112,27 +155,7 @@ let styles = {
         padding: '10px',
         flexShrink: '0',
         flexGrow: '0',
-        flexBasis: '30%',
-        borderRight: '1px solid lightgrey',
-        borderBottom: '1px solid lightgrey',
-        boxSizing: 'border-box'
-    },
-
-    tableColMonth: {
-        padding: '10px',
-        flexShrink: '0',
-        flexGrow: '0',
-        flexBasis: '16%',
-        borderRight: '1px solid lightgrey',
-        borderBottom: '1px solid lightgrey',
-        boxSizing: 'border-box'
-    },
-
-    tableColInterest: {
-        padding: '10px',
-        flexShrink: '0',
-        flexGrow: '0',
-        flexBasis: '24%',
+        flexBasis: '50%',
         borderRight: '1px solid lightgrey',
         borderBottom: '1px solid lightgrey',
         boxSizing: 'border-box'
@@ -161,35 +184,66 @@ let styles = {
 
 export default function Calculator() {
     // Поля ввода
-	const [exchangeRatesRubCny, setExchangeRatesRubCny] = useState(12.58);
-	const [nominalElectricalPower, setNominalElectricalPower] = useState(1100);
-	const [amount, setAmount] = useState(1);
-    const [execution, setExecution] = useState('container');
-    const [useThermalEnergy, setUseThermalEnergy] = useState('allEYear');
-    const [gasPrice, setGasPrice] = useState(6.00);
-    const [priceElectricity, setPriceElectricity] = useState(6.00);
-    const [priceThermalEnergy, setPriceThermalEnergy] = useState(1500.00);
+	const exchangeRatesRubCny = useInput(12.58, 'float');
+	const nominalElectricalPower = useInput(1100);
+	const amount = useInput(1, 'int');
+    const execution = useInput('container');
+    const useThermalEnergy = useInput('allEYear');
+    const gasPrice = useInput(6.00, 'float');
+    const priceElectricity = useInput(6.00, 'float');
+    const priceThermalEnergy = useInput(1500.00, 'float');
 
-    // Ошибки ввода
-	const [exchangeRatesRubCnyError, setExchangeRatesRubCnyError] = useState(false);
-	const [amountError, setAmountError] = useState(false);
-    const [gasPriceError, setGasPriceError] = useState(false);
-	const [priceElectricityError, setPriceElectricityError] = useState(false);
-    const [priceThermalEnergyError, setPriceThermalEnergyError] = useState(false);
+    const [modelGPUArr, setModelGPUArr] = useState(modelsData.find(item => item.electricPower == nominalElectricalPower.value))
 
     //массив исходных данных
-	const [initialData, setInitialData] = useState({
-        modelGPU: '',
-        nominalElectricalPowerGPU: '',
-        numberGPUs: '',
-        nominalThermalPower: '',
-        gasConsumption: '',
-        SNGPU: '',
-        maxOutputPowerGPES: '',
-        oilConsumption: '',
-        oilChangeIntervals: ''
-    });
 
+	const [initialData, setInitialData] = useState([
+        {
+            id: 'modelGPU',
+            name: 'Модель ГПУ',
+            value: modelGPUArr.model
+        },
+        {
+            id: 'nominalElectricalPowerGPU',
+            name: 'Номинальная электрическая мощность ГПУ',
+            value: modelGPUArr.electricPower + ' кВт'
+        },
+        {
+            id: 'numberGPUs',
+            name: 'Количество ГПУ',
+            value: amount.value + ' шт'
+        },
+        {
+            id: 'nominalThermalPower',
+            name: 'Номинальная тепловая мощность',
+            value: `${modelGPUArr.thermalPower} кВт / ${modelGPUArr.thermalPower * 0.00086} Гкал`
+        },
+        {
+            id: 'gasConsumption',
+            name: 'Расход газа',
+            value: modelGPUArr.gasСonsumption + ' нм3'
+        },
+        {
+            id: 'SNGPU',
+            name: 'СН ГПУ',
+            value: ''
+        },
+        {
+            id: 'maxOutputPowerGPES',
+            name: 'Макс. отпуск. мощность ГПЭС (-СН)',
+            value: ''
+        },
+        {
+            id: 'oilConsumption',
+            name: 'Расход масла на угар/Объем при замене',
+            value: ''
+        },
+        {
+            id: 'oilChangeIntervals',
+            name: 'Переодичность замены масла',
+            value: modelGPUArr.oilResource
+        }
+    ]);
     
     const windowWidth = useRef(window.innerWidth);
 
@@ -210,12 +264,12 @@ export default function Calculator() {
 					<form onSubmit={e => formValidate(e)} action="" noValidate style={styles.calculatorForm}>
 						<div style={styles.formField}>
                             <label htmlFor="exchangeRatesRubCny">Курс рубля к ЮАНЬ (руб.)</label>
-                            <input type="input" id="exchangeRatesRubCny" value={exchangeRatesRubCny} onChange={exchangeRatesRubCnyChange} style={!exchangeRatesRubCnyError ? styles.inputAndSelect : styles.inputAndSelectError} />
+                            <input type="input" id="exchangeRatesRubCny" value={exchangeRatesRubCny.value} onChange={exchangeRatesRubCny.onChange} style={!exchangeRatesRubCny.error ? styles.inputAndSelect : styles.inputAndSelectError} />
 						</div>
 
 						<div style={styles.formField}>
                             <label htmlFor="nominalElectricalPower">Номин. эл. мощность ГПУ</label>
-                            <select name="" id="nominalElectricalPower" value={nominalElectricalPower} onChange={nominalElectricalPowerChange} style={styles.inputAndSelect}>
+                            <select name="" id="nominalElectricalPower" value={nominalElectricalPower.value} onChange={nominalElectricalPower.onChange} style={styles.inputAndSelect}>
                                 <option value="1100">1100 кВт</option>
                                 <option value="1500">1500 кВт</option>
                                 <option value="2000">2000 кВт</option>
@@ -224,12 +278,12 @@ export default function Calculator() {
 						
 						<div style={styles.formField}>
                             <label htmlFor="amount">Количество (шт.)</label>
-                            <input type="input" id="amount" value={amount} onChange={amountChange} style={!amountError ? styles.inputAndSelect : styles.inputAndSelectError}/>
+                            <input type="input" id="amount" value={amount.value} onChange={amount.onChange} style={!amount.error ? styles.inputAndSelect : styles.inputAndSelectError}/>
 						</div>
 
                         <div style={styles.formField}>
                             <label htmlFor="execution">Исполнение</label>
-                            <select name="" id="execution" value={execution} onChange={executionChange} style={styles.inputAndSelect}>
+                            <select name="" id="execution" value={execution.value} onChange={execution.onChange} style={styles.inputAndSelect}>
                                 <option value="open">Открытое</option>
                                 <option value="container">Контейнерное</option>
                                 <option value="containerHeatRecovery">Контейнерное с утилизацией тепла</option>
@@ -238,7 +292,7 @@ export default function Calculator() {
 
                         <div style={styles.formField}>
                             <label htmlFor="useThermalEnergy">Использование тепловой энергии ГПУ</label>
-                            <select name="" id="UseThermalEnergy" value={useThermalEnergy} onChange={useThermalEnergyChange} style={styles.inputAndSelect}>
+                            <select name="" id="UseThermalEnergy" value={useThermalEnergy.value} onChange={useThermalEnergy.onChange} style={styles.inputAndSelect}>
                                 <option value="allEYear">Круглый год</option>
                                 <option value="heatingSeason">Отопительный сезон</option>
                             </select>
@@ -246,116 +300,51 @@ export default function Calculator() {
 
                         <div style={styles.formField}>
                             <label htmlFor="gasPrice">Стоимость 1 нм3 газа (в рублях без НДС)</label>
-                            <input type="input" id="gasPrice" value={gasPrice} onChange={gasPriceChange} style={!gasPriceError ? styles.inputAndSelect : styles.inputAndSelectError}/>
+                            <input type="input" id="gasPrice" value={gasPrice.value} onChange={gasPrice.onChange} style={!gasPrice.error ? styles.inputAndSelect : styles.inputAndSelectError}/>
 						</div>
 
                         <div style={styles.formField}>
                             <label htmlFor="priceElectricity">Стимость 1 кВт э/э (в рублях без НДС)</label>
-                            <input type="input" id="priceElectricity" value={priceElectricity} onChange={priceElectricityChange} style={!priceElectricityError ? styles.inputAndSelect : styles.inputAndSelectError}/>
+                            <input type="input" id="priceElectricity" value={priceElectricity.value} onChange={priceElectricity.onChange} style={!priceElectricity.error ? styles.inputAndSelect : styles.inputAndSelectError}/>
 						</div>
 
                         <div style={styles.formField}>
                             <label htmlFor="priceThermalEnergy">Стимость 1 Гкал т/э (руб.)</label>
-                            <input type="input" id="priceThermalEnergy" value={priceThermalEnergy} onChange={priceThermalEnergyChange} style={!priceThermalEnergyError ? styles.inputAndSelect : styles.inputAndSelectError}/>
+                            <input type="input" id="priceThermalEnergy" value={priceThermalEnergy.value} onChange={priceThermalEnergy.onChange} style={!priceThermalEnergy.error ? styles.inputAndSelect : styles.inputAndSelectError}/>
 						</div>
 
 						<Button type="submit" classes="btn form__btn" style={styles.btn}>Рассчитать</Button>
 					</form>
 
-					{/*payments.length > 0 ? <Results payments={payments} classes='calculator__results' /> : null */}
+					{initialData.length > 0 ? <InitialDataTable title='Исходные данные' data={initialData} /> : null}
 
 				</div>
 			</section>
 		</main>
 	)
 
-    // Двусторонняя связь полей
-
-	function exchangeRatesRubCnyChange(event) {
-		let currentValue = event.target.value.replace(/\D/g, '');
-
-		setExchangeRatesRubCny(currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "));
-
-		if(currentValue.length < 1) {
-			setExchangeRatesRubCnyError(true)
-		} else {
-			setExchangeRatesRubCnyError(false)
-		}
-	}
-
-    function nominalElectricalPowerChange(event) {
-		let currentValue = event.target.value;
-		setNominalElectricalPower(currentValue);
-	}
-
-	function amountChange(event) {
-		let currentValue = event.target.value.replace(/\D/g, '');
-
-		setAmount(currentValue);
-		if(currentValue.length < 1) {
-			setAmountError(true)
-		} else {
-			setAmountError(false)
-		}
-	}
-
-    function executionChange(event) {
-		let currentValue = event.target.value;
-		setExecution(currentValue);
-	}
-
-    function useThermalEnergyChange(event) {
-		let currentValue = event.target.value;
-		setUseThermalEnergy(currentValue);
-	}
-
-    function gasPriceChange(event) {
-		let currentValue = event.target.value.replace(/\D/g, '');
-
-		setGasPrice(currentValue);
-		if(currentValue.length < 1) {
-			setGasPriceError(true)
-		} else {
-			setGasPriceError(false)
-		}
-	}
-
-    function priceElectricityChange(event) {
-		let currentValue = event.target.value.replace(/\D/g, '');
-
-		setPriceElectricity(currentValue);
-		if(currentValue.length < 1) {
-			setPriceElectricityError(true)
-		} else {
-			setPriceElectricityError(false)
-		}
-	}
-
-    function priceThermalEnergyChange(event) {
-		let currentValue = event.target.value.replace(/\D/g, '');
-
-		setPriceThermalEnergy(currentValue);
-		if(currentValue.length < 1) {
-			setPriceThermalEnergyError(true)
-		} else {
-			setPriceThermalEnergyError(false)
-		}
-	}
-
     // Валидация формы
 	function formValidate(e) {
 		e.preventDefault();
-		if(exchangeRatesRubCny.length < 1 || amount < 1) {
-			if(exchangeRatesRubCny.length < 1) setExchangeRatesRubCnyError(true);
-			if(interestRate.length < 1) setAmountError(true);
-			return
+		if(
+            exchangeRatesRubCny.error
+            || nominalElectricalPower.error
+            || amount.error
+            || execution.error
+            || useThermalEnergy.error
+            || gasPrice.error
+            || priceElectricity.error
+            || priceThermalEnergy.error
+        ) {
+			console.log("ошибка")
 		} else {
-			setPayments(calculate())
+			calculate()
 		}
 	}
     
     function calculate() {
         //тут расчёты
+        console.log('расчёты')    
     }
 }
 
@@ -366,26 +355,18 @@ function Button({ children, type, ...props }) {
     )
 }
 
-function Results({ payments }) {
+function InitialDataTable({ title, data }) {
     return (
         <div style={styles.calculatorResults}>
             <div style={styles.schedule}>
-                <h2 style={styles.resultsTitle}> График платежей </h2>
+                <h2 style={styles.resultsTitle}>{title}</h2>
                 <div style={styles.scheduleTable}>
-                    <div style={styles.tableRow}>
-                        <div style={styles.tableColMonth}><span style={styles.tableTitle}>Месяц</span></div>
-                        <div style={styles.tableCol}><span style={styles.tableTitle}>Текущий остаток</span></div>
-                        <div style={styles.tableCol}><span style={styles.tableTitle}>Платёж</span></div>
-                        <div style={styles.tableColInterest}><span style={styles.tableTitle}>Проценты</span></div>
-                    </div>
                     {
-                        payments.map(paypent => {
+                        data.map(item => {
                             return (
-                                <div style={styles.tableRow} key={paypent.month}>
-                                    <div style={styles.tableColMonth}>{paypent.month}</div>
-                                    <div style={styles.tableCol}>{paypent.currentDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' руб.'}</div>
-                                    <div style={styles.tableCol}>{paypent.summ.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' руб.'}</div>
-                                    <div style={styles.tableColInterest}>{paypent.interestСharges.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' руб.'}</div>
+                                <div style={styles.tableRow} key={item.id}>
+                                    <div style={styles.tableCol}>{item.name}</div>
+                                    <div style={styles.tableCol}>{item.value}</div>
                                 </div>
                             )
                         })
@@ -393,7 +374,7 @@ function Results({ payments }) {
 
                 </div>
             </div>
-            <div style={styles.diagram}>
+            {/*<div style={styles.diagram}>
                 <h2 style={styles.resultsTitle}> Диаграмма платежей </h2>
                 <div style={styles.diagramContainer}>
                     <Bar
@@ -443,7 +424,7 @@ function Results({ payments }) {
                         }
                     />
                 </div>
-            </div>
+            </div>*/}
         </div>
 	)
 }
@@ -462,9 +443,109 @@ const modelsData = [
         oilResource: 3000,
         oilPrice: 450,
         antifreezePrice: 300,
-        InstallationСostOpen: 2875680,
-        InstallationСostContainer: 3905280,
-        InstallationСostContainerHeatRecovery: 4139280
+        InstallationCost: {
+            open: 2875680,
+            container: 3905280,
+            containerHeatRecovery: 4139280
+        },
+        costSpareParts: {
+            w10: 2725,
+            w30: 3774,
+            w40: 45951,
+            w50: 233600,
+            w60: 388412,
+            w70: 773278,
+            turbineRepair: 48440,
+            generatorRepair: 84000,
+        },
+        costWork: {
+            w10: 28000,
+            w30: 56000,
+            w40: 56000,
+            w50: 360000,
+            w60: 450000,
+            w70: 900000,
+            turbineRepair: 151463,
+            generatorRepair: 400000,
+        }
+    },
+    {
+        model: 'LY1600GH-T',
+        electricPower: 1500,
+        thermalPower: 1670,
+        electricEfficiency: 41.3,
+        thermalEfficiency: 46.0,
+        gasСonsumption: 291,
+        oilConsumptionBurning: 0.2,
+        oilVolumeCrankcase: 240,
+        antifreezeVolume: 180,
+        oilResource: 3000,
+        oilPrice: 450,
+        antifreezePrice: 300,
+        InstallationCost: {
+            open:  3418320,
+            container:  4552800,
+            containerHeatRecovery:  4834800
+        },
+        costSpareParts: {
+            w10: 2449,
+            w30: 4216,
+            w40: 54204,
+            w50: 302115,
+            w60: 502049,
+            w70: 1005138,
+            turbineRepair: 48440,
+            generatorRepair: 84000,
+        },
+        costWork: {
+            w10: 28000,
+            w30: 56000,
+            w40: 56000,
+            w50: 450000,
+            w60: 540000,
+            w70: 1200000,
+            turbineRepair: 151463,
+            generatorRepair: 400000,
+        }
+    },
+    {
+        model: 'LY2000GH-T',
+        electricPower: 2000,
+        thermalPower: 2200,
+        electricEfficiency: 41.6,
+        thermalEfficiency: 45.8,
+        gasСonsumption: 517,
+        oilConsumptionBurning: 0.2,
+        oilVolumeCrankcase: 300,
+        antifreezeVolume: 250,
+        oilResource: 3000,
+        oilPrice: 450,
+        antifreezePrice: 300,
+        InstallationCost: {
+            open: 4009410,
+            container: 5679120,
+            containerHeatRecovery: 6009120
+        },
+        costSpareParts: {
+            w10: 2396,
+            w30: 3872,
+            w40: 63748,
+            w50: 441481,
+            w60: 701866,
+            w70: 1270660,
+            turbineRepair: 96880,
+            generatorRepair: 84000,
+        },
+        costWork: {    
+            w10: 28000,
+            w30: 56000,
+            w40: 56000,
+            w50: 540000,
+            w60: 630000,
+            w70: 1400000,
+            turbineRepair: 302926,
+            generatorRepair: 400000,
+        }
     }
 ]
 
