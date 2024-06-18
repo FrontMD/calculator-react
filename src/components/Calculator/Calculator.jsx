@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 import {Chart as ChartJS} from 'chart.js/auto'
 import {Bar, Line} from 'react-chartjs-2'
@@ -6,7 +6,6 @@ import {Bar, Line} from 'react-chartjs-2'
 ChartJS.register();
 
 // Хук для двусторонней связи полей
-
 function useInput(initialValue, type = '') {
     const [value, setValue] = useState(initialValue);
     const [error, setError] = useState(false)
@@ -47,7 +46,6 @@ function useInput(initialValue, type = '') {
 }
 
 // стили
-
 let styles = {
     container: {
         maxWidth: '1440px',
@@ -113,24 +111,30 @@ let styles = {
         boxSizing: 'border-box'
     },
 
-    calculatorResults: {
+    initialResults: {
         marginTop: '50px',
         display: 'flex',
         alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        gap: '50px',
+        justifyContent: 'flex-start',
+        flexWrap: 'wrap',
+        gap: '0 30px',
+        boxSizing: 'border-box'
+    },
+
+    detailedResults: {
+        marginTop: '50px',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+        flexWrap: 'wrap',
+        gap: '0 30px',
         boxSizing: 'border-box'
     },
     
     resultsTitle: {
+        flexBasis: '100%',
         fontSize: '35px',
         lineHeight: '1.1',
-        boxSizing: 'border-box'
-    },
-    
-    schedule: {
-        flex: '0 0 650px',
         boxSizing: 'border-box'
     },
         
@@ -139,7 +143,19 @@ let styles = {
         lineHeight: '1.2em',
         fontWeight: '400',
         borderTop: '1px solid lightgrey',
-        width: '100%',
+        flexBasis: '50%',
+        maxWidth: '650px',
+        marginTop: '30px',
+        boxSizing: 'border-box'
+    },
+
+    detailedTable: {
+        fontSize: '16px',
+        lineHeight: '1.2em',
+        fontWeight: '400',
+        borderTop: '1px solid lightgrey',
+        flexBasis: '100%',
+        maxWidth: '1330px',
         marginTop: '30px',
         boxSizing: 'border-box'
     },
@@ -152,10 +168,65 @@ let styles = {
     },
 
     tableCol: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         padding: '10px',
         flexShrink: '0',
         flexGrow: '0',
         flexBasis: '50%',
+        borderRight: '1px solid lightgrey',
+        borderBottom: '1px solid lightgrey',
+        boxSizing: 'border-box'
+    },
+
+    detailedTableCol: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px',
+        flexShrink: '0',
+        flexGrow: '0',
+        flexBasis: 'calc(100% / 11)',
+        borderRight: '1px solid lightgrey',
+        borderBottom: '1px solid lightgrey',
+        boxSizing: 'border-box'
+    },
+
+    maintenanceTableCol: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px',
+        flexShrink: '0',
+        flexGrow: '0',
+        flexBasis: 'calc(100% / 12)',
+        borderRight: '1px solid lightgrey',
+        borderBottom: '1px solid lightgrey',
+        boxSizing: 'border-box'
+    },
+
+    maintenanceTableCol2: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px',
+        flexShrink: '0',
+        flexGrow: '0',
+        flexBasis: 'calc(100% / 12 * 2)',
+        borderRight: '1px solid lightgrey',
+        borderBottom: '1px solid lightgrey',
+        boxSizing: 'border-box'
+    },
+
+    maintenanceTableCol3: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px',
+        flexShrink: '0',
+        flexGrow: '0',
+        flexBasis: 'calc(100% / 12 * 3)',
         borderRight: '1px solid lightgrey',
         borderBottom: '1px solid lightgrey',
         boxSizing: 'border-box'
@@ -193,11 +264,14 @@ export default function Calculator() {
     const priceElectricity = useInput(6.00, 'float');
     const priceThermalEnergy = useInput(1500.00, 'float');
 
+    //расчётная модель
     const [modelGPUArr, setModelGPUArr] = useState(modelsData.find(item => item.electricPower == nominalElectricalPower.value))
-
+    useEffect(() => {
+        setModelGPUArr(modelsData.find(item => item.electricPower == nominalElectricalPower.value))
+    }, [nominalElectricalPower])
+    
     //массив исходных данных
-
-	const [initialData, setInitialData] = useState([
+    const [initialData, setInitialData] = useState([
         {
             id: 'modelGPU',
             name: 'Модель ГПУ',
@@ -216,7 +290,8 @@ export default function Calculator() {
         {
             id: 'nominalThermalPower',
             name: 'Номинальная тепловая мощность',
-            value: `${modelGPUArr.thermalPower} кВт / ${modelGPUArr.thermalPower * 0.00086} Гкал`
+            value: modelGPUArr.thermalPower + ' кВт',
+            value2: Math.round(modelGPUArr.thermalPower * 0.00086 * 1000) / 1000 + ' Гкал'
         },
         {
             id: 'gasConsumption',
@@ -226,25 +301,231 @@ export default function Calculator() {
         {
             id: 'SNGPU',
             name: 'СН ГПУ',
-            value: ''
+            value: variables.SNGPU + "%"
         },
         {
             id: 'maxOutputPowerGPES',
             name: 'Макс. отпуск. мощность ГПЭС (-СН)',
-            value: ''
+            value: `${modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100))} кВт`
         },
         {
             id: 'oilConsumption',
             name: 'Расход масла на угар/Объем при замене',
-            value: ''
+            value: modelGPUArr.oilConsumptionBurning + ' г/кВтч',
+            value2: modelGPUArr.oilVolumeCrankcase + ' л'
         },
         {
             id: 'oilChangeIntervals',
             name: 'Переодичность замены масла',
-            value: modelGPUArr.oilResource
+            value: variables.oilResource
+        },
+        {
+            id: 'capex',
+            name: 'CAPEX',
+            value: Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " руб"
         }
-    ]);
-    
+    ])
+
+     //массив тарифов
+     const [tariffData, setTariffData] = useState([
+        {
+            id: 'gasVolume',
+            name: '1 нм3 газа',
+            price: gasPrice.value,
+            indexing: variables.indexing.gas,
+        },
+        {
+            id: 'electricVolume',
+            name: '1 кВт э/э',
+            price: priceElectricity.value,
+            indexing: variables.indexing.electricPower,
+        },
+        {
+            id: 'thermalVolume',
+            name: '1 Гкал т/э',
+            price: priceThermalEnergy.value,
+            indexing: variables.indexing.thermalPower,
+        },
+        {
+            id: 'oilVolume',
+            name: '1 л масла',
+            price: variables.oilPrice,
+            indexing: variables.indexing.oil,
+        },
+        {
+            id: 'antifreezeVolume',
+            name: '1л антифриза',
+            price: variables.oilPrice,
+            indexing: variables.indexing.antifreeze,
+        }
+    ])
+
+    //массив ТО
+    const [maintenanceData, setMaintenanceData] = useState([
+        {
+            id: 'W10',
+            name: 'W10',
+            spareParts: Math.ceil(modelGPUArr.costSpareParts.w10 * exchangeRatesRubCny.value),
+            work: modelGPUArr.costWork.w10,
+            years: distributionMaintenanceYear(maintenance.w10, variables.annualProductionGPU),
+            count: maintenance.w10.length
+        },
+        {
+            id: 'W30',
+            name: 'W30',
+            spareParts: Math.ceil(modelGPUArr.costSpareParts.w30 * exchangeRatesRubCny.value),
+            work: modelGPUArr.costWork.w30,
+            years: distributionMaintenanceYear(maintenance.w30, variables.annualProductionGPU),
+            count: maintenance.w30.length
+        },
+        {
+            id: 'W40',
+            name: 'W40',
+            spareParts: Math.ceil(modelGPUArr.costSpareParts.w40 * exchangeRatesRubCny.value),
+            work: modelGPUArr.costWork.w40,
+            years: distributionMaintenanceYear(maintenance.w40, variables.annualProductionGPU),
+            count: maintenance.w40.length
+        },
+        {
+            id: 'W50',
+            name: 'W50',
+            spareParts: Math.ceil(modelGPUArr.costSpareParts.w50 * exchangeRatesRubCny.value),
+            work: modelGPUArr.costWork.w50,
+            years: distributionMaintenanceYear(maintenance.w50, variables.annualProductionGPU),
+            count: maintenance.w50.length
+        },
+        {
+            id: 'W60',
+            name: 'W60',
+            spareParts: Math.ceil(modelGPUArr.costSpareParts.w60 * exchangeRatesRubCny.value),
+            work: modelGPUArr.costWork.w60,
+            years: distributionMaintenanceYear(maintenance.w60, variables.annualProductionGPU),
+            count: maintenance.w60.length
+        },
+        {
+            id: 'W70',
+            name: 'W70',
+            spareParts: variables.w70Coast ? Math.ceil(modelGPUArr.costSpareParts.w70 * exchangeRatesRubCny.value) : '0',
+            work: variables.w70Coast ? modelGPUArr.costWork.w70 : '0',
+            years: distributionMaintenanceYear(maintenance.w70, variables.annualProductionGPU),
+            count: maintenance.w70.length
+        },
+        {
+            id: 'turbines',
+            name: 'Турбины',
+            spareParts: Math.ceil(modelGPUArr.costSpareParts.turbineRepair * exchangeRatesRubCny.value),
+            work: modelGPUArr.costWork.turbineRepair,
+            years: distributionMaintenanceYear(maintenance.turbines, variables.annualProductionGPU),
+            count: maintenance.turbines.length
+        },
+        {
+            id: 'generator',
+            name: 'Генераторы',
+            spareParts: Math.ceil(modelGPUArr.costSpareParts.generatorRepair * exchangeRatesRubCny.value),
+            work: modelGPUArr.costWork.generatorRepair,
+            years: distributionMaintenanceYear(maintenance.generator, variables.annualProductionGPU),
+            count: maintenance.generator.length
+        },
+        {
+            id: 'oil',
+            name: 'Колличество замен масла на одной ГПУ',
+            spareParts: '',
+            work: '',
+            years: [
+                Math.floor(variables.annualProductionGPU / variables.oilResource),
+                Math.floor((variables.annualProductionGPU * 2 - (Math.floor(variables.annualProductionGPU / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
+                Math.floor((variables.annualProductionGPU * 3 - (Math.floor(variables.annualProductionGPU * 2 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
+                Math.floor((variables.annualProductionGPU * 4 - (Math.floor(variables.annualProductionGPU * 3 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
+                Math.floor((variables.annualProductionGPU * 5 - (Math.floor(variables.annualProductionGPU * 4 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
+                Math.floor((variables.annualProductionGPU * 6 - (Math.floor(variables.annualProductionGPU * 5 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
+                Math.floor((variables.annualProductionGPU * 7 - (Math.floor(variables.annualProductionGPU * 6 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
+                Math.floor((variables.annualProductionGPU * 8 - (Math.floor(variables.annualProductionGPU * 7 / variables.oilResource) *  variables.oilResource)) / variables.oilResource) - 1
+            ],
+            count: Math.floor(variables.annualProductionGPU * 8 / variables.oilResource) - 1
+        }
+
+    ])
+
+    //массив ТЭП до кап. ремонта
+    const [tepData, setTepData] = useState([
+        {
+            id: 'GPUOperatingTime',
+            name: 'Наработка ГПУ, мч',
+            years: calculationOperatingHours(variables.annualProductionGPU),
+            sum: ''
+        },
+        {
+            id: 'GPUOperatingYear',
+            name: 'Наработка ГПУ за год, мч',
+            years: [
+                variables.annualProductionGPU,
+                variables.annualProductionGPU,
+                variables.annualProductionGPU,
+                variables.annualProductionGPU,
+                variables.annualProductionGPU,
+                variables.annualProductionGPU,
+                variables.annualProductionGPU,
+                variables.annualProductionGPU
+            ],
+            sum: variables.annualProductionGPU * 8
+        },
+        {
+            id: 'electricityGeneration',
+            name: 'Выработка э/э ГПЭС, кВтч',
+            years: [
+                variables.annualProductionGPU * modelGPUArr.electricPower * amount.value,
+                variables.annualProductionGPU * modelGPUArr.electricPower * amount.value,
+                variables.annualProductionGPU * modelGPUArr.electricPower * amount.value,
+                variables.annualProductionGPU * modelGPUArr.electricPower * amount.value,
+                variables.annualProductionGPU * modelGPUArr.electricPower * amount.value,
+                variables.annualProductionGPU * modelGPUArr.electricPower * amount.value,
+                variables.annualProductionGPU * modelGPUArr.electricPower * amount.value,
+                variables.annualProductionGPU * modelGPUArr.electricPower * amount.value
+            ],
+            sum: variables.annualProductionGPU * modelGPUArr.electricPower * amount.value * 8
+        },
+        {
+            id: 'usefulOutputElectricity',
+            name: 'Полезный отпуск э/э ГПЭС (- СН), кВтч',
+            years: [
+                modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU,
+                modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU,
+                modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU,
+                modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU,
+                modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU,
+                modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU,
+                modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU,
+                modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU,
+            ],
+            sum: modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU * 8
+        },
+        {
+            id: 'thermalGeneration',
+            name: 'Выработка т/э ГПЭС, Гкал',
+            years: [],
+            sum: [].length
+        },
+        {
+            id: 'gasСonsumption',
+            name: 'Расход газа, нм3',
+            years: [],
+            sum: [].length
+        },
+        {
+            id: 'oilСonsumption',
+            name: 'Расход масла, л',
+            years: [],
+            sum: [].length
+        },  
+    ])
+
+    //массив себестоимости
+    const [costPriceData, setCostPriceData] = useState([])
+
+    //массив окупаемости
+    const [paybackData, setPaybackData] = useState([])        
+
+    // подключение адаптивных стилей
     const windowWidth = useRef(window.innerWidth);
 
     if(windowWidth.current < 1200) {
@@ -316,7 +597,17 @@ export default function Calculator() {
 						<Button type="submit" classes="btn form__btn" style={styles.btn}>Рассчитать</Button>
 					</form>
 
-					{initialData.length > 0 ? <InitialDataTable title='Исходные данные' data={initialData} /> : null}
+					<InitialDataTable title='Исходные данные' data={initialData} />
+
+                    <TariffTable title="Тарифы" data={tariffData} />
+
+                    <MaintenanceTable title="Техническое обслуживание" data={maintenanceData} />
+
+                    <TepTable title="Расчет технико-экономических показателей до капитального ремонта" data={tepData} resultRow={false} />
+
+                    <TepTable title="Расчет себестоимости выработанной ГПУ электроэнергии" data={costPriceData} resultRow={false} />
+                    
+                    <TepTable title="Расчет простого срока окупаемости" data={paybackData} resultRow={true} />
 
 				</div>
 			</section>
@@ -342,11 +633,96 @@ export default function Calculator() {
 		}
 	}
     
-    function calculate() {
-        //тут расчёты
-        console.log('расчёты')    
+    function calculate() { 
+        setInitialData([
+            {
+                id: 'modelGPU',
+                name: 'Модель ГПУ',
+                value: modelGPUArr.model
+            },
+            {
+                id: 'nominalElectricalPowerGPU',
+                name: 'Номинальная электрическая мощность ГПУ',
+                value: modelGPUArr.electricPower + ' кВт'
+            },
+            {
+                id: 'numberGPUs',
+                name: 'Количество ГПУ',
+                value: amount.value + ' шт'
+            },
+            {
+                id: 'nominalThermalPower',
+                name: 'Номинальная тепловая мощность',
+                value: modelGPUArr.thermalPower + ' кВт',
+                value2: Math.round(modelGPUArr.thermalPower * 0.00086 * 1000) / 1000 + ' Гкал'
+            },
+            {
+                id: 'gasConsumption',
+                name: 'Расход газа',
+                value: modelGPUArr.gasСonsumption + ' нм3'
+            },
+            {
+                id: 'SNGPU',
+                name: 'СН ГПУ',
+                value: variables.SNGPU + "%"
+            },
+            {
+                id: 'maxOutputPowerGPES',
+                name: 'Макс. отпуск. мощность ГПЭС (-СН)',
+                value: `${modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100))} кВт`
+            },
+            {
+                id: 'oilConsumption',
+                name: 'Расход масла на угар/Объем при замене',
+                value: modelGPUArr.oilConsumptionBurning + ' г/кВтч',
+                value2: modelGPUArr.oilVolumeCrankcase + ' л'
+            },
+            {
+                id: 'oilChangeIntervals',
+                name: 'Переодичность замены масла',
+                value: variables.oilResource
+            },
+            {
+                id: 'capex',
+                name: 'CAPEX',
+                value: Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " руб"
+            }
+        ]) 
+        setTariffData([
+            {
+                id: 'gasVolume',
+                name: '1 нм3 газа',
+                price: gasPrice.value,
+                indexing: variables.indexing.gas,
+            },
+            {
+                id: 'electricVolume',
+                name: '1 кВт э/э',
+                price: priceElectricity.value,
+                indexing: variables.indexing.electricPower,
+            },
+            {
+                id: 'thermalVolume',
+                name: '1 Гкал т/э',
+                price: priceThermalEnergy.value,
+                indexing: variables.indexing.thermalPower,
+            },
+            {
+                id: 'oilVolume',
+                name: '1 л масла',
+                price: variables.oilPrice,
+                indexing: variables.indexing.oil,
+            },
+            {
+                id: 'antifreezeVolume',
+                name: '1л антифриза',
+                price: variables.oilPrice,
+                indexing: variables.indexing.antifreeze,
+            }
+        ])
     }
 }
+
 
 
 function Button({ children, type, ...props }) {
@@ -355,23 +731,40 @@ function Button({ children, type, ...props }) {
     )
 }
 
-function InitialDataTable({ title, data }) {
-    return (
-        <div style={styles.calculatorResults}>
-            <div style={styles.schedule}>
-                <h2 style={styles.resultsTitle}>{title}</h2>
-                <div style={styles.scheduleTable}>
-                    {
-                        data.map(item => {
-                            return (
-                                <div style={styles.tableRow} key={item.id}>
-                                    <div style={styles.tableCol}>{item.name}</div>
-                                    <div style={styles.tableCol}>{item.value}</div>
-                                </div>
-                            )
-                        })
-                    }
+function InitialDataTable({ title, data}) {
 
+    return (
+        <div style={styles.initialResults}>
+            <h2 style={styles.resultsTitle}>{title}</h2>
+            <div style={styles.scheduleTable}>
+                {
+                    data.map(item => {
+                        return (
+                            <div style={styles.tableRow} key={item.id}>
+                                <div style={styles.tableCol}>{item.name}</div>
+                                <div style={styles.tableCol}>
+                                    <span>{item.value}</span>
+                                    {item.value2 ?  <span>{item.value2}</span> : null}
+                                </div>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+            <div style={styles.scheduleTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.tableCol}>Годовая наработка ГПУ</div>
+                    <div style={styles.tableCol}>{variables.annualProductionGPU + ' мч'}</div>
+                </div>
+
+                <div style={styles.tableRow}>
+                    <div style={styles.tableCol}>Часы использования тепла</div>
+                    <div style={styles.tableCol}>{variables.hoursHeatUsage + ' мч'}</div>
+                </div>
+
+                <div style={styles.tableRow}>
+                    <div style={styles.tableCol}>Стоимость W70</div>
+                    <div style={styles.tableCol}>{variables.w70Coast ? 'включена' : 'не включена'}</div>
                 </div>
             </div>
             {/*<div style={styles.diagram}>
@@ -429,6 +822,138 @@ function InitialDataTable({ title, data }) {
 	)
 }
 
+function TariffTable({title, data}) {
+    return (
+        <div style={styles.detailedResults}>
+            <h2 style={styles.resultsTitle} key={title}>{title}</h2>
+            <div style={styles.detailedTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.detailedTableCol}></div>
+                    <div style={styles.detailedTableCol}>Тарифы</div>
+                    <div style={styles.detailedTableCol}>Индексация</div>
+                    <div style={styles.detailedTableCol}></div>
+                    <div style={styles.detailedTableCol}></div>
+                    <div style={styles.detailedTableCol}></div>
+                    <div style={styles.detailedTableCol}></div>
+                    <div style={styles.detailedTableCol}></div>
+                    <div style={styles.detailedTableCol}></div>
+                    <div style={styles.detailedTableCol}></div>
+                    <div style={styles.detailedTableCol}></div>
+                </div>
+                {
+                    data.map(item => {
+                        return (
+                            <div style={styles.tableRow} key={item.id}>
+                                <div style={styles.detailedTableCol}>{item.name}</div>
+                                <div style={styles.detailedTableCol}>{item.price} руб</div>
+                                <div style={styles.detailedTableCol}>{item.indexing}%</div>
+                                {
+                                    calculateIndexingArr(parseFloat(item.price), parseFloat(item.indexing)).map((indexItem, index) => {
+                                        return (
+                                            <div style={styles.detailedTableCol} key={'year' + index}>{indexItem}</div>
+                                        )
+                                    })
+                                } 
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        </div>
+    )
+}
+
+function MaintenanceTable({title, data}) {
+    return (
+        <div style={styles.detailedResults}>
+            <h2 style={styles.resultsTitle} key={title}>{title}</h2>
+            <div style={styles.detailedTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.maintenanceTableCol}>Вид ТО</div>
+                    <div style={styles.maintenanceTableCol}>ЗиП</div>
+                    <div style={styles.maintenanceTableCol}>Работа</div>
+                    <div style={styles.maintenanceTableCol}>1 год</div>
+                    <div style={styles.maintenanceTableCol}>2 год</div>
+                    <div style={styles.maintenanceTableCol}>3 год</div>
+                    <div style={styles.maintenanceTableCol}>4 год</div>
+                    <div style={styles.maintenanceTableCol}>5 год</div>
+                    <div style={styles.maintenanceTableCol}>6 год</div>
+                    <div style={styles.maintenanceTableCol}>7 год</div>
+                    <div style={styles.maintenanceTableCol}>8 год</div>
+                    <div style={styles.maintenanceTableCol}>ИТОГО</div>
+                </div>
+                {
+                    data.map(item => {
+                        return (
+                            <div style={styles.tableRow} key={item.id}>
+                                { 
+                                
+                                    item.spareParts && item.work ? (
+                                        <>
+                                        <div style={styles.maintenanceTableCol}>{item.name}</div>
+                                        <div style={styles.maintenanceTableCol}>{item.spareParts !== '0' ? item.spareParts + ' руб' : '-'}</div>
+                                        <div style={styles.maintenanceTableCol}>{item.work !== '0' ? item.work + ' руб' : '-'}</div>
+                                        </>
+                                        ) : (
+                                            <div style={styles.maintenanceTableCol3}>{item.name}</div>
+                                        )
+                                }
+                                {
+                                    item.years.map((innerItem, index) => {
+                                        return (
+                                            <div style={styles.maintenanceTableCol} key={index}>{innerItem > 0 ? innerItem : ''}</div>
+                                        )
+                                    })
+                                }
+                                <div style={styles.maintenanceTableCol}>{item.count}</div>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        </div>
+    )
+}
+
+function TepTable({title, data}) {
+    return (
+        <div style={styles.detailedResults}>
+            <h2 style={styles.resultsTitle} key={title}>{title}</h2>
+            <div style={styles.detailedTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.maintenanceTableCol3}>Показатель</div>
+                    <div style={styles.maintenanceTableCol}>1 год</div>
+                    <div style={styles.maintenanceTableCol}>2 год</div>
+                    <div style={styles.maintenanceTableCol}>3 год</div>
+                    <div style={styles.maintenanceTableCol}>4 год</div>
+                    <div style={styles.maintenanceTableCol}>5 год</div>
+                    <div style={styles.maintenanceTableCol}>6 год</div>
+                    <div style={styles.maintenanceTableCol}>7 год</div>
+                    <div style={styles.maintenanceTableCol}>8 год</div>
+                    <div style={styles.maintenanceTableCol}>ИТОГО</div>
+                </div>
+                {
+                    data.map(item => {
+                        return (
+                            <div style={styles.tableRow} key={item.id}>
+                                <div style={styles.maintenanceTableCol3}>{item.name}</div>
+                                {
+                                    item.years.map((innerItem, index) => {
+                                        return (
+                                            <div style={styles.maintenanceTableCol} key={index}>{innerItem}</div>
+                                        )
+                                    })
+                                }
+                                <div style={styles.maintenanceTableCol}>{item.sum}</div>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        </div>
+    )
+}
+
 const modelsData = [
     {
         model: 'LY1200GH-T',
@@ -440,10 +965,7 @@ const modelsData = [
         oilConsumptionBurning: 0.2,
         oilVolumeCrankcase: 180,
         antifreezeVolume: 150,
-        oilResource: 3000,
-        oilPrice: 450,
-        antifreezePrice: 300,
-        InstallationCost: {
+        installationCost: {
             open: 2875680,
             container: 3905280,
             containerHeatRecovery: 4139280
@@ -479,10 +1001,7 @@ const modelsData = [
         oilConsumptionBurning: 0.2,
         oilVolumeCrankcase: 240,
         antifreezeVolume: 180,
-        oilResource: 3000,
-        oilPrice: 450,
-        antifreezePrice: 300,
-        InstallationCost: {
+        installationCost: {
             open:  3418320,
             container:  4552800,
             containerHeatRecovery:  4834800
@@ -518,10 +1037,7 @@ const modelsData = [
         oilConsumptionBurning: 0.2,
         oilVolumeCrankcase: 300,
         antifreezeVolume: 250,
-        oilResource: 3000,
-        oilPrice: 450,
-        antifreezePrice: 300,
-        InstallationCost: {
+        installationCost: {
             open: 4009410,
             container: 5679120,
             containerHeatRecovery: 6009120
@@ -549,3 +1065,66 @@ const modelsData = [
     }
 ]
 
+const variables = {
+    SNGPU: 3,
+    annualProductionGPU: 8000,
+    hoursHeatUsage: 4392,
+    w70Coast: false,
+    oilPrice: 450,
+    antifreezePrice: 300, 
+    oilResource: 3000,
+    indexing: {
+        gas: 2,
+        electricPower: 3,
+        thermalPower: 2,
+        oil: 4,
+        antifreeze: 4
+    }
+}
+
+const maintenance = {
+    w10: [50, 16050, 32050, 48050],
+    w30: [2000, 6000, 10000, 14000, 18000, 22000, 26000, 30000, 34000, 38000, 42000, 46000, 50000, 54000, 58000, 62000],
+    w40: [4000, 8000, 12000, 20000, 24000, 28000, 36000, 40000, 44000, 52000, 56000, 60000],
+    w50: [16000, 48000],   
+    w60: [32000],
+    w70: [64000],
+    turbines: [12000, 24000, 36000, 48000, 60000],
+    generator: [20000, 40000, 60000]
+}
+
+//Вспомогательные функции
+
+function calculateIndexingArr(startPrice, indexing) {
+    indexing = indexing / 100;
+    let acc = startPrice * indexing + startPrice;
+    let i;
+    let resultArr = []
+    for(i = 1; i <= 8; i++ ) {
+        resultArr.push(Math.round(acc * 100) / 100)
+        acc = acc * indexing + acc
+    }
+
+    return resultArr
+}
+
+function distributionMaintenanceYear(maintenanceArr, annualOperatingTime) {
+    let resultArr = [];
+
+    for(let i = 1; i <= 8; i++) {
+        let filteredArr = maintenanceArr.filter(item => item > annualOperatingTime * i - annualOperatingTime && item <= annualOperatingTime * i);
+        resultArr.push(filteredArr.length)
+    }
+
+    return resultArr
+}
+
+function calculationOperatingHours(yearHours) {
+    let resultArr = [];
+    
+    for(let i = 1; i <= 8; i++) {
+        resultArr.push(yearHours * i)
+    }
+
+    return resultArr
+}
