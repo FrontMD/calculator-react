@@ -171,7 +171,7 @@ let styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '10px',
+        padding: '5px 10px',
         flexShrink: '0',
         flexGrow: '0',
         flexBasis: '50%',
@@ -184,7 +184,7 @@ let styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '10px',
+        padding: '5px 10px',
         flexShrink: '0',
         flexGrow: '0',
         flexBasis: 'calc(100% / 11)',
@@ -197,7 +197,7 @@ let styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '10px',
+        padding: '5px 10px',
         flexShrink: '0',
         flexGrow: '0',
         flexBasis: 'calc(100% / 12)',
@@ -210,7 +210,7 @@ let styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '10px',
+        padding: '5px 10px',
         flexShrink: '0',
         flexGrow: '0',
         flexBasis: 'calc(100% / 12 * 2)',
@@ -223,7 +223,7 @@ let styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '10px',
+        padding: '5px 10px',
         flexShrink: '0',
         flexGrow: '0',
         flexBasis: 'calc(100% / 12 * 3)',
@@ -269,8 +269,6 @@ export default function Calculator() {
     useEffect(() => {
         setModelGPUArr(modelsData.find(item => item.electricPower == nominalElectricalPower.value))
     }, [nominalElectricalPower])
-
-    console.log(modelGPUArr)
 
     //массив ТО
     const [maintenanceData, setMaintenanceData] = useState([
@@ -381,9 +379,16 @@ export default function Calculator() {
 
     //Массив годовых показателей
     const [finalAnnualIndicators, setFinalAnnualIndicators] = useState(calculatorResult.finalAnnualIndicatorsArr)
+
+    //Данные для диаграммы Bar
+    const [energyProductionСostsDiagram, setEnergyProductionСostsDiagram] = useState(calculatorResult.energyProductionСostsDiagramObj)
+
+    //Данные для диаграммы затрат на энергию
+    const [energyСostsDiagram, setEnergyСostsDiagram] = useState(calculatorResult.energyСostsDiagramObj)
     
     // расчёт массивов тарифов, ТЭП, себестоимости и окупаемости
     function getTepData() {
+        let capex = Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value)
         // результирующий объект
         let resultObj = {
             resultInitialData: [
@@ -437,7 +442,7 @@ export default function Calculator() {
                 {
                     id: 'capex',
                     name: 'CAPEX',
-                    value: Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽"
+                    value: capex.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽"
                 }
             ], 
             resultTariffArr: [
@@ -487,54 +492,56 @@ export default function Calculator() {
                     value: modelGPUArr.model,
                 },
                 {
-                    id: 'type',
+                    id: 'electricPower',
                     name: 'Номинальная электрическая мощность, кВт',
                     value: modelGPUArr.electricPower,
                 },
                 {
-                    id: 'type',
+                    id: 'thermalPower',
                     name: 'Номинальная тепловая мощность, кВт',
                     value: modelGPUArr.thermalPower,
                 },
                 {
-                    id: 'type',
+                    id: 'electricEfficiency',
                     name: 'Электрический КПД',
                     value: modelGPUArr.electricEfficiency,
                 },
                 {
-                    id: 'type',
+                    id: 'gasConsumption',
                     name: 'Потребление природного газа',
                     value: modelGPUArr.gasСonsumption,
                 },
                 {
-                    id: 'type',
+                    id: 'amount',
                     name: 'Количество установок, шт',
                     value: amount.value,
                 },
                 {
-                    id: 'type',
+                    id: 'resultElectricPower',
                     name: 'Суммарная электрическая мощность, кВт',
                     value: modelGPUArr.electricPower * amount.value,
                 },
                 {
-                    id: 'type',
+                    id: 'resultThermalPower',
                     name: 'Суммарная тепловая мощность, Гкал/час',
                     value: modelGPUArr.thermalPower * amount.value,
                 },
                 {
-                    id: 'type',
+                    id: 'execution',
                     name: 'Выбранное исполнение',
-                    value: execution.value,
+                    value: execution.value === 'open' ? 'Открытое' : 
+                            execution.value === 'container' ? 'Контейнерное' :
+                            execution.value === 'containerHeatRecovery' ? 'Контейнерное с утилизацией тепла' : '',
                 },
                 {
-                    id: 'type',
+                    id: 'Capex',
                     name: 'Стоимость оборудования в выбранной комплектации',
-                    value: Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽",
+                    value: capex.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽",
                 },
                 {
-                    id: 'type',
+                    id: 'powerCost',
                     name: 'Удельная стоимость 1 кВт установленной мощности',
-                    value: Math.round(Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") / modelGPUArr.electricPower * 100) / 100,
+                    value: (Math.round(Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value) / modelGPUArr.electricPower * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽",
                 },
             ],
             finalAnnualIndicatorsArr: []
@@ -725,6 +732,25 @@ export default function Calculator() {
             resultPayback: 0
         }
 
+        // Объект для диаграммы затрат на энергию
+        let energyСostsDiagramObj = {
+            labels: ['установка', '1 год', '2 год', '3 год', '4 год', '5 год', '6 год', '7 год', '8 год'],
+            datasets: [
+                {
+                    label: "Приобретение",
+                    data: [
+                        0,
+                    ]
+                },
+                {
+                    label: "Выработка",
+                    data: [
+                        capex,
+                    ]
+                }
+            ]
+        }
+
         // цикл по годам
         for(let i = 1; i <= 8; i++) {
             //переменные ТЭП
@@ -788,8 +814,8 @@ export default function Calculator() {
                     totalСostsMaintenanceSumm += (maintenanceData[j].spareParts + maintenanceData[j].work) * maintenanceData[j].years[i - 1] * amount.value;
                 }
             }
-
             let totalСostsMaintenance = Math.round(totalСostsMaintenanceSumm);
+
             let totalСosts = totalСostsGas + totalСostsOil + totalСostsMaintenance;
             let costsPrice = Math.round(totalСosts / usefulOutputElectricity * 100) / 100;
             let costsPriceGas = Math.round(totalСostsGas / usefulOutputElectricity * 100) / 100;
@@ -892,6 +918,10 @@ export default function Calculator() {
             sumsPaybackArr.resultSavings += resultSavings
             sumsPaybackArr.economicEffect += economicEffect > 0 ? economicEffect : 0
             sumsPaybackArr.resultPayback += resultPayback
+
+            // заполняем данные для диаграммы затрат на энергию
+            energyСostsDiagramObj.datasets[0].data.push(energyСostsDiagramObj.datasets[0].data[i - 1] + purchaseEnergyResources)
+            energyСostsDiagramObj.datasets[1].data.push(energyСostsDiagramObj.datasets[1].data[i - 1] + totalСosts)
         }
 
         //Помещаем итоги ТЭП в массив ТЭП
@@ -977,32 +1007,32 @@ export default function Calculator() {
                     {
                         id: 'averageElectricalEnergyСosts',
                         name: 'Средние затраты за расчетный период на приобретение электрической энергии в год у сбытовой компании, Рубли',
-                        value: Math.round(resultPaybackArr[0].sum / resultPaybackArr[0].years.length),
+                        value: Math.round(resultPaybackArr[0].sum / resultPaybackArr[0].years.length) + ' ₽',
                     },
                     {
                         id: 'averageThermalEnergyСosts',
                         name: 'Средние затраты за расчетный период на приобретение тепловой энергии в год у сбытовой компании, Рубли',
-                        value: Math.round(resultPaybackArr[1].sum / resultPaybackArr[1].years.length),
+                        value: Math.round(resultPaybackArr[1].sum / resultPaybackArr[1].years.length) + ' ₽',
                     },
                     {
                         id: 'totalEnergyCosts',
                         name: 'Итого затраты на приобретение энергоносителей, Рубли',
-                        value: Math.round((resultPaybackArr[0].sum / resultPaybackArr[0].years.length) + (resultPaybackArr[1].sum / resultPaybackArr[1].years.length)),
+                        value: Math.round((resultPaybackArr[0].sum / resultPaybackArr[0].years.length) + (resultPaybackArr[1].sum / resultPaybackArr[1].years.length)) + ' ₽',
                     },
                     {
                         id: 'averageEnergyProductionCosts',
                         name: 'Средние затраты за расчетный период на производство электрической и тепловой энергии на собственном энергоцентре, Рубли',
-                        value: Math.round(resultCostPriceArr[0].sum / resultPaybackArr[0].years.length),
+                        value: Math.round(resultCostPriceArr[0].sum / resultPaybackArr[0].years.length) + ' ₽',
                     },
                     {
                         id: 'averageSavings',
                         name: 'Средняя за расчетный период ежегодная экономия, Рубли',
-                        value: Math.round(resultPaybackArr[5].sum / resultPaybackArr[5].years.length),
+                        value: Math.round(resultPaybackArr[5].sum / resultPaybackArr[5].years.length) + ' ₽',
                     },
                     {
                         id: 'paybackPeriod',
                         name: 'Срок окупаемости, лет',
-                        value: resultPaybackArr[7].sum,
+                        value: floatToYearsMonths(resultPaybackArr[7].sum),
                     }
                 ]
             },           
@@ -1010,6 +1040,31 @@ export default function Calculator() {
 
         // добавляем массив годовых показателей в результирующий объект
         resultObj.finalAnnualIndicatorsArr = finalAnnualIndicatorsArr
+
+        // Объект для диаграммы затрат на выработку электоэнергии
+        let energyProductionСostsDiagramObj = {
+            labels: resultCostPriceArr[0].years.map((_, index) => index + 1 + ' год'),
+            datasets: [
+                {
+                    label: "Топливо",
+                    data: resultCostPriceArr[1].years
+                },
+                {
+                    label: "Масло",
+                    data: resultCostPriceArr[2].years
+                },
+                {
+                    label: "ТО",
+                    data: resultCostPriceArr[3].years
+                }
+            ]
+        }
+
+        // добавляем объект для диаграммы затрат в результирующий объект
+        resultObj.energyProductionСostsDiagramObj = energyProductionСostsDiagramObj
+
+        // добавляем объект для диаграммы затрат на энергию в результирующий объект
+        resultObj.energyСostsDiagramObj = energyСostsDiagramObj
 
         return resultObj
     }
@@ -1086,7 +1141,7 @@ export default function Calculator() {
 						<Button type="submit" classes="btn form__btn" style={styles.btn}>Рассчитать</Button>
 					</form>
 
-                    <FinalData costTechChars={finalCostTechChars} annualIndicators={finalAnnualIndicators}/>
+                    <FinalData costTechChars={finalCostTechChars} annualIndicators={finalAnnualIndicators} energyProductionСostsDiagram={energyProductionСostsDiagram} energyСostsDiagram={energyСostsDiagram}/>
 
 					<InitialDataTable title='Исходные данные' data={initialData} />
 
@@ -1133,6 +1188,8 @@ export default function Calculator() {
         setPaybackData(calculatorResult.resultPaybackArr)
         setFinalCostTechChars(calculatorResult.finalCostTechCharsArr)
         setFinalAnnualIndicators(calculatorResult.finalAnnualIndicatorsArr)
+        setEnergyProductionСostsDiagram(calculatorResult.energyProductionСostsDiagramObj)
+        setEnergyСostsDiagram(calculatorResult.energyСostsDiagramObj)
     }
 }
 
@@ -1410,17 +1467,18 @@ function PaybackTable({title, data}) {
     )
 }
 
-function FinalData({ costTechChars, annualIndicators}) {
+function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiagram, energyСostsDiagram}) {
     let styles = {
         finalContainer: {
             display: 'flex',
-            gap: '50px'
+            gap: '50px',
+            marginTop: '50px'
         },
         finalTables: {
             display: 'flex',
             flexDirection: 'column',
             gap: '30px',
-            flexBasis: '650px'
+            flex: '0 0 650px'
         },
         finalTable: {
             fontSize: '15px',
@@ -1431,7 +1489,11 @@ function FinalData({ costTechChars, annualIndicators}) {
             flexBasis: '50%',
             maxWidth: '100%',
             width: '100%',
-            marginTop: '30px',
+            boxSizing: 'border-box'
+        },
+        finalTableBlock: {
+            maxWidth: '100%',
+            width: '100%',
             boxSizing: 'border-box'
         },
         finalTableRow: {
@@ -1440,11 +1502,24 @@ function FinalData({ costTechChars, annualIndicators}) {
             borderLeft: '1px solid black',
             boxSizing: 'border-box'
         },
+        finalTableTitleCol: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '5px 10px',
+            flexShrink: '0',
+            flexGrow: '0',
+            flex: '0 0 100%',
+            fontWeight: '700',
+            borderRight: '1px solid black',
+            borderBottom: '1px solid black',
+            boxSizing: 'border-box'
+        },
         finalTableCol1: {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '10px',
+            padding: '5px 10px',
             flexShrink: '0',
             flexGrow: '0',
             flex: '0 0 60%',
@@ -1456,14 +1531,20 @@ function FinalData({ costTechChars, annualIndicators}) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
-            padding: '10px',
+            padding: '5px 10px',
             flexShrink: '0',
             flexGrow: '0',
-            flex: '0 0 40%',
+            flex: '1 0 40%',
             borderRight: '1px solid black',
             borderBottom: '1px solid black',
             boxSizing: 'border-box'
-        }
+        },
+        diagrams: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '30px',
+            flex: '1 1 auto'
+        },
     }
 
     return (
@@ -1471,75 +1552,94 @@ function FinalData({ costTechChars, annualIndicators}) {
             <div style={styles.finalTables}>
                 <div style={styles.finalTable}>
                     {
-                        costTechChars.map(item => {
+                        costTechChars.map((item, index) => {
                             return (
                                 <div style={styles.finalTableRow} key={item.id}>
                                     <div style={styles.finalTableCol1}>{item.name}</div>
                                     <div style={styles.finalTableCol2}>
-                                        <span>{item.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span>
+                                        <span>{index !== 0 ? item.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : item.value}</span>
                                     </div>
                                 </div>
                             )
                         })
                     }
                 </div>
-            </div>
-            {/*<div style={styles.diagram}>
-                <h2 style={styles.resultsTitle}> Диаграмма платежей </h2>
-                <div style={styles.diagramContainer}>
-                    <Bar
-                        data={
-                            {
-                                labels: payments.map(payment => payment.month),
-                                datasets: [
+                <div style={styles.finalTable}>
+                    {
+                        annualIndicators.map(item => {
+                            return (
+                                <div style={styles.finalTableBlock} key={item.name}>
+                                    <div style={styles.finalTableRow} key={item.id}>
+                                        <div style={styles.finalTableTitleCol}>{item.name}</div>
+                                    </div>
                                     {
-                                        label: "Основной долг",
-                                        data: payments.map(payment => parseFloat(payment.currentDebt))
-                                    },
-                                    {
-                                        label: "Проценты",
-                                        data: payments.map(payment => parseFloat(payment.interestСharges))
+                                        item.data.map(dataItem => {
+                                            return (
+                                                <div style={styles.finalTableRow} key={dataItem.id}>
+                                                    <div style={styles.finalTableCol1}>{dataItem.name}</div>
+                                                    <div style={styles.finalTableCol2}>
+                                                        <span>{dataItem.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span>
+                                                    </div>
+                                                </div> 
+                                            )
+                                        })
                                     }
-                                ]
-                            }
-                        }
-                        options={
-                            {
-                                scales: {
-                                    x: {
-                                    stacked: true,
-                                    },
-                                    y: {
-                                    stacked: true,
-                                    },
-                                },
-                            }
-                        }  
-                    />
-                    <Line
-                        data={
-                            {
-                                labels: payments.map(payment => payment.month),
-                                datasets: [
-                                    {
-                                        label: "Основной долг",
-                                        data: payments.map(payment => payment.currentDebt)
-                                    },
-                                    {
-                                        label: "Проценты",
-                                        data: payments.map(payment => payment.interestСharges)
-                                    }
-                                ]
-                            }
-                        }
-                    />
+                                </div>
+                             
+                            )
+                        })
+                    }
                 </div>
-            </div>*/}
+            </div>
+            <div style={styles.diagrams}>
+                
+                <Bar
+                    data={energyProductionСostsDiagram}
+                    options={
+                        {
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    font: {
+                                        size: 20
+                                    },
+                                    text: 'Затраты на выработку э/э'
+                                }
+                            },
+                            scales: {
+                                x: {
+                                stacked: true,
+                                },
+                                y: {
+                                stacked: true,
+                                },
+                            },
+                        }
+                    }  
+                />
+                <Line
+                    data={energyСostsDiagram}
+                    options={
+                        {
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    font: {
+                                        size: 20
+                                    },
+                                    text: 'Затраты на э/э'
+                                }
+                            },
+                        }
+                    }
+                />
+                
+            </div>
         </div>
 	)
 }
 
-/**********Статичные данные ****/
+/**********Статичные данные ******************/
 
 // Модели
 const modelsData = [
@@ -1711,7 +1811,7 @@ function distributionMaintenanceYear(maintenanceArr, annualOperatingTime) {
     return resultArr
 }
 
-//преобразует десятичные числа в годы и месяцы
+//преобразование десятичных дробей чисел в годы и месяцы
 function floatToYearsMonths(value)
 {
     var totalDays = value * 365;
@@ -1720,12 +1820,12 @@ function floatToYearsMonths(value)
     var yearsText = numWord(years, ['год', 'года', 'лет']);
     var monthsText = numWord(months, ['месяц', 'месяца', 'месяцев']);
 
-    var result = years + " " + yearsText + ' ' + months + " " + monthsText;
+    var result = (years > 0 ? years + " " + yearsText + " " : '') + (months > 0 ? months + " " + monthsText : '');
 
     return result
 }
 
-//склоняет числительные
+//склонение числительных
 function numWord(value, words) {  
 	value = Math.abs(value) % 100; 
 	var num = value % 10;
