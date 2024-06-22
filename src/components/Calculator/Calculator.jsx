@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useMemo } from 'react';
 
 import {Chart as ChartJS} from 'chart.js/auto'
 import {Bar, Line} from 'react-chartjs-2'
@@ -139,7 +139,7 @@ let styles = {
     },
         
     scheduleTable: {
-        fontSize: '15px',
+        fontSize: '14px',
         lineHeight: '1.2em',
         fontWeight: '400',
         borderTop: '1px solid lightgrey',
@@ -150,7 +150,7 @@ let styles = {
     },
 
     detailedTable: {
-        fontSize: '15px',
+        fontSize: '14px',
         lineHeight: '1.2em',
         fontWeight: '400',
         borderTop: '1px solid lightgrey',
@@ -254,28 +254,34 @@ let styles = {
 }
 
 export default function Calculator() {
+
     // Поля ввода
 	const exchangeRatesRubCny = useInput(12.58, 'float');
 	const nominalElectricalPower = useInput(1100);
 	const amount = useInput(1, 'int');
-    const execution = useInput('containerHeatRecovery');
+    const execution = useInput('open');
     const useThermalEnergy = useInput('heatingSeason');
     const gasPrice = useInput(6.00, 'float');
     const priceElectricity = useInput(6.00, 'float');
     const priceThermalEnergy = useInput(1500.00, 'float');
 
+    const exchangeRatesRubCnyValue = parseFloat(exchangeRatesRubCny.value.toString().replace(/[^\.\d]/g, ''));
+	const amountValue = parseFloat(amount.value.toString().replace(/\D/g, ''));
+    const gasPriceValue = parseFloat(gasPrice.value.toString().replace(/[^\.\d]/g, ''));
+    const priceElectricityValue = parseFloat(priceElectricity.value.toString().replace(/[^\.\d]/g, ''));
+    const priceThermalEnergyValue = parseFloat(priceThermalEnergy.value.toString().replace(/[^\.\d]/g, ''));
+
     //расчётная модель
-    const [modelGPUArr, setModelGPUArr] = useState(modelsData.find(item => item.electricPower == nominalElectricalPower.value))
-    useEffect(() => {
-        setModelGPUArr(modelsData.find(item => item.electricPower == nominalElectricalPower.value))
+    const modelGPUArr = useMemo(() => {
+        return modelsData.find(item => item.electricPower == nominalElectricalPower.value)
     }, [nominalElectricalPower])
 
     //массив ТО
-    const [maintenanceData, setMaintenanceData] = useState([
+    const maintenanceData = [
         {
             id: 'W10',
             name: 'W10',
-            spareParts: Math.ceil(modelGPUArr.costSpareParts.w10 * exchangeRatesRubCny.value),
+            spareParts: modelGPUArr.costSpareParts.w10 * exchangeRatesRubCnyValue,
             work: modelGPUArr.costWork.w10,
             years: distributionMaintenanceYear(maintenance.w10, variables.annualProductionGPU),
             count: maintenance.w10.length
@@ -283,7 +289,7 @@ export default function Calculator() {
         {
             id: 'W30',
             name: 'W30',
-            spareParts: Math.ceil(modelGPUArr.costSpareParts.w30 * exchangeRatesRubCny.value),
+            spareParts: modelGPUArr.costSpareParts.w30 * exchangeRatesRubCnyValue,
             work: modelGPUArr.costWork.w30,
             years: distributionMaintenanceYear(maintenance.w30, variables.annualProductionGPU),
             count: maintenance.w30.length
@@ -291,7 +297,7 @@ export default function Calculator() {
         {
             id: 'W40',
             name: 'W40',
-            spareParts: Math.ceil(modelGPUArr.costSpareParts.w40 * exchangeRatesRubCny.value),
+            spareParts: modelGPUArr.costSpareParts.w40 * exchangeRatesRubCnyValue,
             work: modelGPUArr.costWork.w40,
             years: distributionMaintenanceYear(maintenance.w40, variables.annualProductionGPU),
             count: maintenance.w40.length
@@ -299,7 +305,7 @@ export default function Calculator() {
         {
             id: 'W50',
             name: 'W50',
-            spareParts: Math.ceil(modelGPUArr.costSpareParts.w50 * exchangeRatesRubCny.value),
+            spareParts: modelGPUArr.costSpareParts.w50 * exchangeRatesRubCnyValue,
             work: modelGPUArr.costWork.w50,
             years: distributionMaintenanceYear(maintenance.w50, variables.annualProductionGPU),
             count: maintenance.w50.length
@@ -307,7 +313,7 @@ export default function Calculator() {
         {
             id: 'W60',
             name: 'W60',
-            spareParts: Math.ceil(modelGPUArr.costSpareParts.w60 * exchangeRatesRubCny.value),
+            spareParts: modelGPUArr.costSpareParts.w60 * exchangeRatesRubCnyValue,
             work: modelGPUArr.costWork.w60,
             years: distributionMaintenanceYear(maintenance.w60, variables.annualProductionGPU),
             count: maintenance.w60.length
@@ -315,7 +321,7 @@ export default function Calculator() {
         {
             id: 'W70',
             name: 'W70',
-            spareParts: variables.w70Coast ? Math.ceil(modelGPUArr.costSpareParts.w70 * exchangeRatesRubCny.value) : '0',
+            spareParts: variables.w70Coast ? modelGPUArr.costSpareParts.w70 * exchangeRatesRubCnyValue : '0',
             work: variables.w70Coast ? modelGPUArr.costWork.w70 : '0',
             years: distributionMaintenanceYear(maintenance.w70, variables.annualProductionGPU),
             count: maintenance.w70.length
@@ -323,7 +329,7 @@ export default function Calculator() {
         {
             id: 'turbines',
             name: 'Турбины',
-            spareParts: Math.ceil(modelGPUArr.costSpareParts.turbineRepair * exchangeRatesRubCny.value),
+            spareParts: modelGPUArr.costSpareParts.turbineRepair * exchangeRatesRubCnyValue,
             work: modelGPUArr.costWork.turbineRepair,
             years: distributionMaintenanceYear(maintenance.turbines, variables.annualProductionGPU),
             count: maintenance.turbines.length
@@ -331,7 +337,7 @@ export default function Calculator() {
         {
             id: 'generator',
             name: 'Генераторы',
-            spareParts: Math.ceil(modelGPUArr.costSpareParts.generatorRepair * exchangeRatesRubCny.value),
+            spareParts: modelGPUArr.costSpareParts.generatorRepair * exchangeRatesRubCnyValue,
             work: modelGPUArr.costWork.generatorRepair,
             years: distributionMaintenanceYear(maintenance.generator, variables.annualProductionGPU),
             count: maintenance.generator.length
@@ -341,23 +347,16 @@ export default function Calculator() {
             name: 'Колличество замен масла на одной ГПУ',
             spareParts: '',
             work: '',
-            years: [
-                Math.floor(variables.annualProductionGPU / variables.oilResource),
-                Math.floor((variables.annualProductionGPU * 2 - (Math.floor(variables.annualProductionGPU / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
-                Math.floor((variables.annualProductionGPU * 3 - (Math.floor(variables.annualProductionGPU * 2 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
-                Math.floor((variables.annualProductionGPU * 4 - (Math.floor(variables.annualProductionGPU * 3 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
-                Math.floor((variables.annualProductionGPU * 5 - (Math.floor(variables.annualProductionGPU * 4 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
-                Math.floor((variables.annualProductionGPU * 6 - (Math.floor(variables.annualProductionGPU * 5 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
-                Math.floor((variables.annualProductionGPU * 7 - (Math.floor(variables.annualProductionGPU * 6 / variables.oilResource) *  variables.oilResource)) / variables.oilResource),
-                Math.floor((variables.annualProductionGPU * 8 - (Math.floor(variables.annualProductionGPU * 7 / variables.oilResource) *  variables.oilResource)) / variables.oilResource) - 1
-            ],
+            years: getOilYears(),
             count: Math.floor(variables.annualProductionGPU * 8 / variables.oilResource) - 1
         }
 
-    ])
+    ]
 
     //тут массивы всех расчётов
-    let calculatorResult = getTepData();
+    let calculatorResult = useMemo(() => {
+        return getTepData();
+    }, []);
 
     //массив исходных данных
     const [initialData, setInitialData] = useState(calculatorResult.resultInitialData)
@@ -388,7 +387,12 @@ export default function Calculator() {
     
     // расчёт массивов тарифов, ТЭП, себестоимости и окупаемости
     function getTepData() {
-        let capex = Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value)
+
+        const capex = modelGPUArr.installationCost[execution.value] * exchangeRatesRubCnyValue * amountValue;
+        const thermalPowerСalories = modelGPUArr.thermalPower * 0.00086;
+        const resultElectricPower = modelGPUArr.electricPower * amountValue;
+        const maxOutputPowerGPES = resultElectricPower * (1 - (variables.SNGPU / 100));
+
         // результирующий объект
         let resultObj = {
             resultInitialData: [
@@ -405,13 +409,13 @@ export default function Calculator() {
                 {
                     id: 'numberGPUs',
                     name: 'Количество ГПУ',
-                    value: amount.value + ' шт'
+                    value: amountValue + ' шт'
                 },
                 {
                     id: 'nominalThermalPower',
                     name: 'Номинальная тепловая мощность',
                     value: modelGPUArr.thermalPower + ' кВт',
-                    value2: Math.round(modelGPUArr.thermalPower * 0.00086 * 1000) / 1000 + ' Гкал'
+                    value2: (Math.round(thermalPowerСalories * 1000) / 1000) + ' Гкал'
                 },
                 {
                     id: 'gasConsumption',
@@ -426,7 +430,7 @@ export default function Calculator() {
                 {
                     id: 'maxOutputPowerGPES',
                     name: 'Макс. отпуск. мощность ГПЭС (-СН)',
-                    value: `${modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100))} кВт`
+                    value: maxOutputPowerGPES + ' кВт'
                 },
                 {
                     id: 'oilConsumption',
@@ -449,23 +453,23 @@ export default function Calculator() {
                 {
                     id: 'gasVolume',
                     name: '1 нм3 газа',
-                    price: gasPrice.value,
+                    price: gasPriceValue,
                     indexing: variables.indexing.gas,
-                    years: calculateIndexingArr(parseFloat(gasPrice.value), parseFloat(variables.indexing.gas))
+                    years: calculateIndexingArr(gasPriceValue, parseFloat(variables.indexing.gas))
                 },
                 {
                     id: 'electricVolume',
                     name: '1 кВт э/э',
-                    price: priceElectricity.value,
+                    price: priceElectricityValue,
                     indexing: variables.indexing.electricPower,
-                    years: calculateIndexingArr(parseFloat(priceElectricity.value), parseFloat(variables.indexing.electricPower))
+                    years: calculateIndexingArr(priceElectricityValue, parseFloat(variables.indexing.electricPower))
                 },
                 {
                     id: 'thermalVolume',
                     name: '1 Гкал т/э',
-                    price: priceThermalEnergy.value,
+                    price: priceThermalEnergyValue,
                     indexing: variables.indexing.thermalPower,
-                    years: calculateIndexingArr(parseFloat(priceThermalEnergy.value), parseFloat(variables.indexing.thermalPower))
+                    years: calculateIndexingArr(priceThermalEnergyValue, parseFloat(variables.indexing.thermalPower))
                 },
                 {
                     id: 'oilVolume',
@@ -482,9 +486,6 @@ export default function Calculator() {
                     years: calculateIndexingArr(parseFloat(variables.antifreezePrice), parseFloat(variables.indexing.antifreeze))
                 }
             ],
-            resultTepArr: [],
-            resultCostPriceArr: [],
-            resultPaybackArr: [],
             finalCostTechCharsArr: [
                 {
                     id: 'type',
@@ -514,17 +515,17 @@ export default function Calculator() {
                 {
                     id: 'amount',
                     name: 'Количество установок, шт',
-                    value: amount.value,
+                    value: amountValue,
                 },
                 {
                     id: 'resultElectricPower',
                     name: 'Суммарная электрическая мощность, кВт',
-                    value: modelGPUArr.electricPower * amount.value,
+                    value: resultElectricPower,
                 },
                 {
                     id: 'resultThermalPower',
                     name: 'Суммарная тепловая мощность, Гкал/час',
-                    value: modelGPUArr.thermalPower * amount.value,
+                    value: modelGPUArr.thermalPower * amountValue,
                 },
                 {
                     id: 'execution',
@@ -541,10 +542,9 @@ export default function Calculator() {
                 {
                     id: 'powerCost',
                     name: 'Удельная стоимость 1 кВт установленной мощности',
-                    value: (Math.round(Math.round(modelGPUArr.installationCost[execution.value] * exchangeRatesRubCny.value * amount.value) / modelGPUArr.electricPower * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽",
+                    value: (Math.round(capex / (modelGPUArr.electricPower * amountValue) * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽",
                 },
-            ],
-            finalAnnualIndicatorsArr: []
+            ]
         }
 
         // массив ТЭП
@@ -632,7 +632,7 @@ export default function Calculator() {
             },
             {
                 id: 'costsPrice',
-                name: 'Затраты на выработку э/э, в т.ч.:',
+                name: 'Себестоимость 1 кВт э/э, в т.ч.:',
                 years: [],
                 sum: 0
             },
@@ -745,7 +745,7 @@ export default function Calculator() {
                 {
                     label: "Выработка",
                     data: [
-                        capex,
+                        Math.round(capex),
                     ]
                 }
             ]
@@ -756,26 +756,31 @@ export default function Calculator() {
             //переменные ТЭП
             let operatingTime = variables.annualProductionGPU * i;
             let operatingYear = variables.annualProductionGPU;
-            let electricityGeneration = variables.annualProductionGPU * modelGPUArr.electricPower * amount.value;
-            let usefulOutputElectricity = modelGPUArr.electricPower * amount.value * (1 - (variables.SNGPU / 100)) * variables.annualProductionGPU;
+            let electricityGeneration = variables.annualProductionGPU * resultElectricPower;
+            let usefulOutputElectricity = maxOutputPowerGPES * variables.annualProductionGPU;
             let thermalGeneration = 0
             if(execution.value === 'containerHeatRecovery') {
+                let intermediateResult = amountValue * thermalPowerСalories;
                 if(useThermalEnergy.value === 'heatingSeason') {
                     if(operatingTime < variables.annualProductionGPU) {
-                        thermalGeneration = variables.hoursHeatUsage;
-                    } else if(operatingYear < 2520) {
-                        thermalGeneration = operatingYear
-                    } else if(operatingYear < 6988) {
-                        thermalGeneration = 2520
+                        if(operatingYear < 2520) {
+                            thermalGeneration = operatingYear * intermediateResult
+                        } else if(operatingYear < 6988) {
+                            thermalGeneration = 2520 * intermediateResult
+                        } else {
+                            thermalGeneration = (operatingYear - 4368) * intermediateResult;
+                        }
                     } else {
-                        thermalGeneration = operatingYear - 4368;
+                        thermalGeneration = variables.hoursHeatUsage * intermediateResult;
                     }
                 } else {
-                    thermalGeneration = variables.annualProductionGPU;
+                    thermalGeneration = operatingYear * intermediateResult;
                 }
+
+                thermalGeneration = thermalGeneration
             }
-            let gasСonsumption = operatingYear * modelGPUArr.gasСonsumption * amount.value;
-            let oilСonsumption = Math.ceil(maintenanceData[8].years[i - 1] * modelGPUArr.oilVolumeCrankcase * amount.value + (electricityGeneration * modelGPUArr.oilConsumptionBurning / 1000 * 1.11));
+            let gasСonsumption = operatingYear * modelGPUArr.gasСonsumption * amountValue;
+            let oilСonsumption = maintenanceData[8].years[i - 1] * modelGPUArr.oilVolumeCrankcase * amountValue + (electricityGeneration * modelGPUArr.oilConsumptionBurning / 1000 * 1.11);
 
 
             // Промежуточный массив ТЭП
@@ -805,22 +810,22 @@ export default function Calculator() {
             /****************************************************** */
 
             // Переменные себестоимости
-            let totalСostsGas = Math.round(gasСonsumption * resultObj.resultTariffArr[0].years[i - 1])
-            let totalСostsOil = Math.round(oilСonsumption * resultObj.resultTariffArr[3].years[i - 1])
+            let totalСostsGas = gasСonsumption * resultObj.resultTariffArr[0].years[i - 1]
+            let totalСostsOil = oilСonsumption * resultObj.resultTariffArr[3].years[i - 1]
 
             let totalСostsMaintenanceSumm = 0
             for(let j = 0; j < 8; j++) {
                 if(maintenanceData[j].years[i - 1] > 0) {
-                    totalСostsMaintenanceSumm += (maintenanceData[j].spareParts + maintenanceData[j].work) * maintenanceData[j].years[i - 1] * amount.value;
+                    totalСostsMaintenanceSumm += (maintenanceData[j].spareParts + maintenanceData[j].work) * maintenanceData[j].years[i - 1] * amountValue;
                 }
             }
-            let totalСostsMaintenance = Math.round(totalСostsMaintenanceSumm);
+            let totalСostsMaintenance = totalСostsMaintenanceSumm;
 
             let totalСosts = totalСostsGas + totalСostsOil + totalСostsMaintenance;
-            let costsPrice = Math.round(totalСosts / usefulOutputElectricity * 100) / 100;
-            let costsPriceGas = Math.round(totalСostsGas / usefulOutputElectricity * 100) / 100;
-            let costsPriceOil = Math.round(totalСostsOil / usefulOutputElectricity * 100) / 100;
-            let costsPriceMaintenance = Math.round(totalСostsMaintenance / usefulOutputElectricity * 100) / 100;
+            let costsPrice = totalСosts / usefulOutputElectricity
+            let costsPriceGas = totalСostsGas / usefulOutputElectricity
+            let costsPriceOil = totalСostsOil / usefulOutputElectricity
+            let costsPriceMaintenance = totalСostsMaintenance / usefulOutputElectricity
 
             // Промежуточный массив себестоимости
             let yearCostPriceArr = [
@@ -847,45 +852,44 @@ export default function Calculator() {
             /****************************************************** */
             
             //переменные окупаемости
-            let purchaseElectricity = Math.round(usefulOutputElectricity * resultObj.resultTariffArr[1].years[i - 1])
+            let purchaseElectricity = usefulOutputElectricity * resultObj.resultTariffArr[1].years[i - 1]
 
             let purchaseThermalEnergy = 0
-            if(priceThermalEnergy.value == 0) {
-                purchaseThermalEnergy = Math.round(thermalGeneration * 140 * resultObj.resultTariffArr[0].years[i - 1])
+            if(priceThermalEnergyValue == 0) {
+                purchaseThermalEnergy = thermalGeneration * 140 * resultObj.resultTariffArr[0].years[i - 1]
             } else {
-                purchaseThermalEnergy = Math.round(thermalGeneration * resultObj.resultTariffArr[2].years[i - 1])
+                purchaseThermalEnergy = thermalGeneration * resultObj.resultTariffArr[2].years[i - 1]
             }
 
-            let purchaseEnergyResources = Math.round(purchaseElectricity + purchaseThermalEnergy)
-            let savingsElectricity = Math.round(purchaseElectricity - totalСosts)
+            let purchaseEnergyResources = purchaseElectricity + purchaseThermalEnergy
+            let savingsElectricity = purchaseElectricity - totalСosts
 
             let savingsThermalEnergy = 0
-            if(priceThermalEnergy.value == 0) {
-                savingsThermalEnergy = Math.round(thermalGeneration * 125 * resultObj.resultTariffArr[0].years[i - 1])
+            if(priceThermalEnergyValue == 0) {
+                savingsThermalEnergy = thermalGeneration * 125 * resultObj.resultTariffArr[0].years[i - 1]
                 
             } else {
-                savingsThermalEnergy = Math.round(thermalGeneration * resultObj.resultTariffArr[2].years[i - 1])
+                savingsThermalEnergy = thermalGeneration * resultObj.resultTariffArr[2].years[i - 1]
             }
 
             let resultSavings = savingsElectricity + savingsThermalEnergy
             
             let economicEffect = 0
-            let intCapex = parseInt(resultObj.resultInitialData[9].value.replace(/\D/g, ''))
             if(i > 1) {
                 if(resultPaybackArr[6].years[i - 2] + resultSavings < resultSavings ) {
-                    economicEffect = Math.round(resultPaybackArr[6].years[i - 2] + resultSavings)
+                    economicEffect = resultPaybackArr[6].years[i - 2] + resultSavings
                 } else {
                     economicEffect = resultSavings
                 }                
             } else {
-                if(resultSavings - intCapex < 0 ) {
-                    economicEffect = resultSavings - intCapex
+                if(resultSavings - capex < 0 ) {
+                    economicEffect = resultSavings - capex
                 } else {
                     economicEffect = resultSavings
                 }
             }
 
-            let resultPayback =  Math.round(Math.abs(economicEffect / resultSavings) * 100) / 100
+            let resultPayback =  Math.abs(economicEffect / resultSavings)
             if(economicEffect / resultSavings < 0) {
                 resultPayback = 1;
             } else if(economicEffect / resultSavings === 1) {
@@ -934,10 +938,10 @@ export default function Calculator() {
 
         //Рассчитываем итоги себестоимости
         sumsCostPriceArr.totalСosts += sumsCostPriceArr.totalСostsGas + sumsCostPriceArr.totalСostsOil + sumsCostPriceArr.totalСostsMaintenance
-        sumsCostPriceArr.costsPrice += Math.round(sumsCostPriceArr.totalСosts / sumsTepArr.usefulOutputElectricity * 100) / 100;
-        sumsCostPriceArr.costsPriceGas += Math.round(sumsCostPriceArr.totalСostsGas / sumsTepArr.usefulOutputElectricity * 100) / 100;
-        sumsCostPriceArr.costsPriceOil += Math.round(sumsCostPriceArr.totalСostsOil / sumsTepArr.usefulOutputElectricity * 100) / 100;
-        sumsCostPriceArr.costsPriceMaintenance += Math.round(sumsCostPriceArr.totalСostsMaintenance / sumsTepArr.usefulOutputElectricity * 100) / 100;
+        sumsCostPriceArr.costsPrice += sumsCostPriceArr.totalСosts / sumsTepArr.usefulOutputElectricity;
+        sumsCostPriceArr.costsPriceGas += sumsCostPriceArr.totalСostsGas / sumsTepArr.usefulOutputElectricity;
+        sumsCostPriceArr.costsPriceOil += sumsCostPriceArr.totalСostsOil / sumsTepArr.usefulOutputElectricity;
+        sumsCostPriceArr.costsPriceMaintenance += sumsCostPriceArr.totalСostsMaintenance / sumsTepArr.usefulOutputElectricity;
 
         //Помещаем итоги себестоимости в массив себестоимости
         resultCostPriceArr.forEach((item, index) => {
@@ -1047,21 +1051,25 @@ export default function Calculator() {
             datasets: [
                 {
                     label: "Топливо",
-                    data: resultCostPriceArr[1].years
+                    data: resultCostPriceArr[1].years.map(item => Math.round(item))
                 },
                 {
                     label: "Масло",
-                    data: resultCostPriceArr[2].years
+                    data: resultCostPriceArr[2].years.map(item => Math.round(item))
                 },
                 {
                     label: "ТО",
-                    data: resultCostPriceArr[3].years
+                    data: resultCostPriceArr[3].years.map(item => Math.round(item))
                 }
             ]
         }
 
         // добавляем объект для диаграммы затрат в результирующий объект
         resultObj.energyProductionСostsDiagramObj = energyProductionСostsDiagramObj
+
+        // округляем данные для диаграммы затрат на энергию
+        energyСostsDiagramObj.datasets[0].data = energyСostsDiagramObj.datasets[0].data.map(item => Math.round(item))
+        energyСostsDiagramObj.datasets[1].data = energyСostsDiagramObj.datasets[1].data.map(item => Math.round(item))
 
         // добавляем объект для диаграммы затрат на энергию в результирующий объект
         resultObj.energyСostsDiagramObj = energyСostsDiagramObj
@@ -1241,6 +1249,7 @@ function InitialDataTable({ title, data}) {
 }
 
 function TariffTable({title, data}) {
+
     return (
         <div style={styles.detailedResults}>
             <h2 style={styles.resultsTitle} key={title}>{title}</h2>
@@ -1268,7 +1277,7 @@ function TariffTable({title, data}) {
                                 {
                                     item.years.map((indexItem, index) => {
                                         return (
-                                            <div style={styles.detailedTableCol} key={'year' + index}>{indexItem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</div>
+                                            <div style={styles.detailedTableCol} key={'year' + index}>{(Math.round(indexItem * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</div>
                                         )
                                     })
                                 } 
@@ -1282,6 +1291,7 @@ function TariffTable({title, data}) {
 }
 
 function MaintenanceTable({title, data}) {
+
     return (
         <div style={styles.detailedResults}>
             <h2 style={styles.resultsTitle} key={title}>{title}</h2>
@@ -1309,8 +1319,8 @@ function MaintenanceTable({title, data}) {
                                     item.spareParts && item.work ? (
                                         <>
                                         <div style={styles.maintenanceTableCol}>{item.name}</div>
-                                        <div style={styles.maintenanceTableCol}>{item.spareParts !== '0' ? item.spareParts.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
-                                        <div style={styles.maintenanceTableCol}>{item.work !== '0' ? item.work.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
+                                        <div style={styles.maintenanceTableCol}>{item.spareParts !== '0' ? Math.round(item.spareParts).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
+                                        <div style={styles.maintenanceTableCol}>{item.work !== '0' ? Math.round(item.work).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
                                         </>
                                         ) : (
                                             <div style={styles.maintenanceTableCol3}>{item.name}</div>
@@ -1334,6 +1344,7 @@ function MaintenanceTable({title, data}) {
 }
 
 function TepTable({title, data}) {
+
     return (
         <div style={styles.detailedResults}>
             <h2 style={styles.resultsTitle} key={title}>{title}</h2>
@@ -1358,11 +1369,11 @@ function TepTable({title, data}) {
                                 {
                                     item.years.map((innerItem, index) => {
                                         return (
-                                            <div style={styles.maintenanceTableCol} key={index}>{innerItem !== 0 ? innerItem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
+                                            <div style={styles.maintenanceTableCol} key={index}>{innerItem !== 0 ? Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
                                         )
                                     })
                                 }
-                                <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? item.sum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
+                                <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
                             </div>
                         )
                     })
@@ -1373,6 +1384,7 @@ function TepTable({title, data}) {
 }
 
 function CostPriceTable({title, data}) {
+
     return (
         <div style={styles.detailedResults}>
             <h2 style={styles.resultsTitle} key={title}>{title}</h2>
@@ -1390,18 +1402,26 @@ function CostPriceTable({title, data}) {
                     <div style={styles.maintenanceTableCol}>ИТОГО</div>
                 </div>
                 {
-                    data.map(item => {
+                    data.map((item, index) => {
                         return (
                             <div style={styles.tableRow} key={item.id}>
                                 <div style={styles.maintenanceTableCol3}>{item.name}</div>
                                 {
-                                    item.years.map((innerItem, index) => {
+                                    item.years.map((innerItem, innerIndex) => {
                                         return (
-                                            <div style={styles.maintenanceTableCol} key={index}>{innerItem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
+                                            index < 4 ?
+                                                <div style={styles.maintenanceTableCol} key={innerIndex}>{Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
+                                            :
+                                                <div style={styles.maintenanceTableCol} key={innerIndex}>{(Math.round(innerItem * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
                                         )
                                     })
                                 }
-                                <div style={styles.maintenanceTableCol}>{item.sum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
+                                {
+                                    index < 4 ?
+                                        <div style={styles.maintenanceTableCol}>{Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
+                                    :
+                                        <div style={styles.maintenanceTableCol}>{(Math.round(item.sum * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
+                                }
                             </div>
                         )
                     })
@@ -1412,6 +1432,7 @@ function CostPriceTable({title, data}) {
 }
 
 function PaybackTable({title, data}) {
+
     return (
         <div style={styles.detailedResults}>
             <h2 style={styles.resultsTitle} key={title}>{title}</h2>
@@ -1446,17 +1467,17 @@ function PaybackTable({title, data}) {
                                         return (
 
                                             index != data.length - 1 ?
-                                            <div style={styles.maintenanceTableCol} key={innerIndex}>{innerItem !== 0 ? innerItem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")  + ' ₽' : '-'}</div>
+                                            <div style={styles.maintenanceTableCol} key={innerIndex}>{innerItem !== 0 ? Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")  + ' ₽' : '-'}</div>
                                             :
-                                            <div style={styles.maintenanceTableCol} key={innerIndex}>{innerItem !== 0 ? innerItem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
+                                            <div style={styles.maintenanceTableCol} key={innerIndex}>{innerItem !== 0 ? Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
                                         )
                                     })
                                 }
                                 {
                                     index != data.length - 1 ?
-                                    <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? item.sum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")  + ' ₽' : '-'}</div>
+                                    <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")  + ' ₽' : '-'}</div>
                                     :
-                                    <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? item.sum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
+                                    <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
                                 }
                             </div>
                         )
@@ -1468,6 +1489,7 @@ function PaybackTable({title, data}) {
 }
 
 function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiagram, energyСostsDiagram}) {
+
     let styles = {
         finalContainer: {
             display: 'flex',
@@ -1481,7 +1503,7 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
             flex: '0 0 650px'
         },
         finalTable: {
-            fontSize: '15px',
+            fontSize: '14px',
             lineHeight: '1.2em',
             fontWeight: '400',
             backgroundColor: '#C6E0B4',
@@ -1501,6 +1523,12 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
             alignItems: 'stretch',
             borderLeft: '1px solid black',
             boxSizing: 'border-box'
+        },
+        finalTableTitle: {
+            width: '100%',
+            padding: '0 0 15px',
+            fontSize: '20px',
+            fontWeight: '700'
         },
         finalTableTitleCol: {
             display: 'flex',
@@ -1550,45 +1578,56 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
     return (
         <div style={styles.finalContainer}>
             <div style={styles.finalTables}>
-                <div style={styles.finalTable}>
-                    {
-                        costTechChars.map((item, index) => {
-                            return (
-                                <div style={styles.finalTableRow} key={item.id}>
-                                    <div style={styles.finalTableCol1}>{item.name}</div>
-                                    <div style={styles.finalTableCol2}>
-                                        <span>{index !== 0 ? item.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : item.value}</span>
-                                    </div>
-                                </div>
-                            )
-                        })
-                    }
-                </div>
-                <div style={styles.finalTable}>
-                    {
-                        annualIndicators.map(item => {
-                            return (
-                                <div style={styles.finalTableBlock} key={item.name}>
+                <div>
+                    <div  style={styles.finalTableTitle}>Стоимость и основные технические характеристики</div>
+                    <div style={styles.finalTable}>
+                        {
+                            costTechChars.map((item, index) => {
+                                return (
                                     <div style={styles.finalTableRow} key={item.id}>
-                                        <div style={styles.finalTableTitleCol}>{item.name}</div>
+                                        <div style={styles.finalTableCol1}>{item.name}</div>
+                                        <div style={styles.finalTableCol2}>
+                                            <span>{index !== 0 ? item.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : item.value}</span>
+                                        </div>
                                     </div>
-                                    {
-                                        item.data.map(dataItem => {
-                                            return (
-                                                <div style={styles.finalTableRow} key={dataItem.id}>
-                                                    <div style={styles.finalTableCol1}>{dataItem.name}</div>
-                                                    <div style={styles.finalTableCol2}>
-                                                        <span>{dataItem.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span>
-                                                    </div>
-                                                </div> 
-                                            )
-                                        })
-                                    }
-                                </div>
-                             
-                            )
-                        })
-                    }
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+                <div>
+                    <div  style={styles.finalTableTitle}>Расчетные годовые показатели при годовой наработке 8000 рабочих часов</div>
+                    <div style={styles.finalTable}>
+                        {
+                            annualIndicators.map(item => {
+                                return (
+                                    <div style={styles.finalTableBlock} key={item.name}>
+                                        <div style={styles.finalTableRow} key={item.id}>
+                                            <div style={styles.finalTableTitleCol}>{item.name}</div>
+                                        </div>
+                                        {
+                                            item.data.map(dataItem => {
+                                                return (
+                                                    <div style={styles.finalTableRow} key={dataItem.id}>
+                                                        <div style={styles.finalTableCol1}>{dataItem.name}</div>
+                                                        <div style={styles.finalTableCol2}>
+                                                            {
+                                                                item.id !== 'Payback' ?
+                                                                    <span>{dataItem.value !== 0  ? Math.round(dataItem.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</span>
+                                                                :
+                                                                    <span>{dataItem.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span>
+                                                            }
+                                                        </div>
+                                                    </div> 
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                
+                                )
+                            })
+                        }
+                    </div>
                 </div>
             </div>
             <div style={styles.diagrams}>
@@ -1659,12 +1698,12 @@ const modelsData = [
             containerHeatRecovery: 4139280
         },
         costSpareParts: {
-            w10: 2725,
-            w30: 3774,
-            w40: 45951,
-            w50: 233600,
-            w60: 388412,
-            w70: 773278,
+            w10: 2725.38,
+            w30: 3774.12,
+            w40: 45950.52,
+            w50: 233600.36,
+            w60: 388411.576,
+            w70: 773277.68,
             turbineRepair: 48440,
             generatorRepair: 84000,
         },
@@ -1685,7 +1724,7 @@ const modelsData = [
         thermalPower: 1670,
         electricEfficiency: 41.3,
         thermalEfficiency: 46.0,
-        gasСonsumption: 291,
+        gasСonsumption: 391,
         oilConsumptionBurning: 0.2,
         oilVolumeCrankcase: 240,
         antifreezeVolume: 180,
@@ -1695,12 +1734,12 @@ const modelsData = [
             containerHeatRecovery:  4834800
         },
         costSpareParts: {
-            w10: 2449,
-            w30: 4216,
-            w40: 54204,
-            w50: 302115,
-            w60: 502049,
-            w70: 1005138,
+            w10: 2448.6,
+            w30: 4215.96,
+            w40: 54204.36,
+            w50: 302115.03,
+            w60: 502049.338,
+            w70: 1005137.686,
             turbineRepair: 48440,
             generatorRepair: 84000,
         },
@@ -1731,12 +1770,12 @@ const modelsData = [
             containerHeatRecovery: 6009120
         },
         costSpareParts: {
-            w10: 2396,
-            w30: 3872,
-            w40: 63748,
-            w50: 441481,
-            w60: 701866,
-            w70: 1270660,
+            w10: 2396.24,
+            w30: 3872.4,
+            w40: 63747.6,
+            w50: 441480.592,
+            w60: 701865.752,
+            w70: 1270660.132,
             turbineRepair: 96880,
             generatorRepair: 84000,
         },
@@ -1792,7 +1831,7 @@ function calculateIndexingArr(startPrice, indexing) {
     let i;
     let resultArr = []
     for(i = 1; i <= 8; i++ ) {
-        resultArr.push(Math.round(acc * 100) / 100)
+        resultArr.push(acc)
         acc = acc * indexing + acc
     }
 
@@ -1811,6 +1850,25 @@ function distributionMaintenanceYear(maintenanceArr, annualOperatingTime) {
     return resultArr
 }
 
+//расчёт количества замен масла по годам
+function getOilYears() {
+    let resultArr = [];
+    let annualProductionGPU = variables.annualProductionGPU;
+    let oilResource = variables.oilResource;
+
+    for(let i = 0; i < 8; i++) {
+        if(i === 0) {
+            resultArr.push(Math.floor(annualProductionGPU / oilResource))
+        } else if(i === 7) {
+            resultArr.push(Math.floor((annualProductionGPU * (i+1) - (Math.floor(annualProductionGPU * i / oilResource) * oilResource)) / oilResource) - 1)
+        } else {
+            resultArr.push(Math.floor((annualProductionGPU * (i+1) - (Math.floor(annualProductionGPU * i / oilResource) * oilResource)) / oilResource))
+        }
+    }
+
+    return resultArr
+}
+
 //преобразование десятичных дробей чисел в годы и месяцы
 function floatToYearsMonths(value)
 {
@@ -1820,7 +1878,7 @@ function floatToYearsMonths(value)
     var yearsText = numWord(years, ['год', 'года', 'лет']);
     var monthsText = numWord(months, ['месяц', 'месяца', 'месяцев']);
 
-    var result = (years > 0 ? years + " " + yearsText + " " : '') + (months > 0 ? months + " " + monthsText : '');
+    var result = years  === 0 && months === 0 ? years + " " + yearsText : (years > 0 ? years + " " + yearsText + " " : '') + (months > 0 ? months + " " + monthsText : '');
 
     return result
 }
