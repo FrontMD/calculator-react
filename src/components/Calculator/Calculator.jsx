@@ -1,7 +1,8 @@
 import { useState, useRef, useMemo } from 'react';
 
-import {Chart as ChartJS} from 'chart.js/auto'
-import {Bar, Line} from 'react-chartjs-2'
+import { Chart as ChartJS } from 'chart.js/auto'
+import { Bar, Line } from 'react-chartjs-2'
+import emailjs from '@emailjs/browser';
 
 ChartJS.register();
 
@@ -11,24 +12,24 @@ function useInput(initialValue, type = '') {
     const [error, setError] = useState(false)
 
     function onChange(event) {
-        
-        if(type === 'float') {
+
+        if (type === 'float') {
             let currentValue = event.target.value.replace(/[^\.\d]/g, '');
-            
+
             setValue(currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "))
-    
-            if(currentValue.length < 1) {
+
+            if (currentValue.length < 1) {
                 setError(true)
             } else {
                 setError(false)
             }
 
-        } else if(type === 'int') {
+        } else if (type === 'int') {
             let currentValue = event.target.value.replace(/\D/g, '');
 
             setValue(currentValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "));
 
-            if(currentValue.length < 1) {
+            if (currentValue.length < 1) {
                 setError(true)
             } else {
                 setError(false)
@@ -110,6 +111,24 @@ let styles = {
         transition: 'background-color 0.2s ease',
         boxSizing: 'border-box'
     },
+    btnHover: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gridСolumnStart: '1',
+        gridColumnEnd: '3',
+        padding: '15px 30px',
+        fontFamily: '"Raleway", sans-serif',
+        fontSize: '16px',
+        color: 'white',
+        backgroundColor: '#07664E',
+        outline: 'none',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s ease',
+        boxSizing: 'border-box'
+    },
 
     initialResults: {
         marginTop: '50px',
@@ -130,14 +149,14 @@ let styles = {
         gap: '0 30px',
         boxSizing: 'border-box'
     },
-    
+
     resultsTitle: {
         flexBasis: '100%',
         fontSize: '35px',
         lineHeight: '1.1',
         boxSizing: 'border-box'
     },
-        
+
     scheduleTable: {
         fontSize: '14px',
         lineHeight: '1.2em',
@@ -236,7 +255,7 @@ let styles = {
         fontWeight: '700',
         boxSizing: 'border-box'
     },
-    
+
     diagram: {
         flexBasis: 'auto',
         flexGrow: '1',
@@ -256,9 +275,9 @@ let styles = {
 export default function Calculator() {
 
     // Поля ввода
-	const exchangeRatesRubCny = useInput(12.58, 'float');
-	const nominalElectricalPower = useInput(1100);
-	const amount = useInput(1, 'int');
+    const exchangeRatesRubCny = useInput(12.58, 'float');
+    const nominalElectricalPower = useInput(1100);
+    const amount = useInput(1, 'int');
     const execution = useInput('open');
     const useThermalEnergy = useInput('heatingSeason');
     const gasPrice = useInput(6.00, 'float');
@@ -266,7 +285,7 @@ export default function Calculator() {
     const priceThermalEnergy = useInput(1500.00, 'float');
 
     const exchangeRatesRubCnyValue = parseFloat(exchangeRatesRubCny.value.toString().replace(/[^\.\d]/g, ''));
-	const amountValue = parseFloat(amount.value.toString().replace(/\D/g, ''));
+    const amountValue = parseFloat(amount.value.toString().replace(/\D/g, ''));
     const gasPriceValue = parseFloat(gasPrice.value.toString().replace(/[^\.\d]/g, ''));
     const priceElectricityValue = parseFloat(priceElectricity.value.toString().replace(/[^\.\d]/g, ''));
     const priceThermalEnergyValue = parseFloat(priceThermalEnergy.value.toString().replace(/[^\.\d]/g, ''));
@@ -384,7 +403,7 @@ export default function Calculator() {
 
     //Данные для диаграммы затрат на энергию
     const [energyСostsDiagram, setEnergyСostsDiagram] = useState(calculatorResult.energyСostsDiagramObj)
-    
+
     // расчёт массивов тарифов, ТЭП, себестоимости и окупаемости
     function getTepData() {
 
@@ -448,7 +467,7 @@ export default function Calculator() {
                     name: 'CAPEX',
                     value: capex.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽"
                 }
-            ], 
+            ],
             resultTariffArr: [
                 {
                     id: 'gasVolume',
@@ -504,12 +523,12 @@ export default function Calculator() {
                 },
                 {
                     id: 'electricEfficiency',
-                    name: 'Электрический КПД',
+                    name: 'Электрический КПД, %',
                     value: modelGPUArr.electricEfficiency,
                 },
                 {
                     id: 'gasConsumption',
-                    name: 'Потребление природного газа',
+                    name: 'Потребление природного газа, Нм3/ч',
                     value: modelGPUArr.gasСonsumption,
                 },
                 {
@@ -530,18 +549,18 @@ export default function Calculator() {
                 {
                     id: 'execution',
                     name: 'Выбранное исполнение',
-                    value: execution.value === 'open' ? 'Открытое' : 
-                            execution.value === 'container' ? 'Контейнерное' :
+                    value: execution.value === 'open' ? 'Открытое' :
+                        execution.value === 'container' ? 'Контейнерное' :
                             execution.value === 'containerHeatRecovery' ? 'Контейнерное с утилизацией тепла' : '',
                 },
                 {
                     id: 'Capex',
-                    name: 'Стоимость оборудования в выбранной комплектации',
+                    name: 'Стоимость оборудования в выбранной комплектации, руб. без НДС',
                     value: capex.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽",
                 },
                 {
                     id: 'powerCost',
-                    name: 'Удельная стоимость 1 кВт установленной мощности',
+                    name: 'Удельная стоимость 1 кВт установленной мощности, руб. без НДС',
                     value: (Math.round(capex / (modelGPUArr.electricPower * amountValue) * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽",
                 },
             ]
@@ -752,20 +771,20 @@ export default function Calculator() {
         }
 
         // цикл по годам
-        for(let i = 1; i <= 8; i++) {
+        for (let i = 1; i <= 8; i++) {
             //переменные ТЭП
             let operatingTime = variables.annualProductionGPU * i;
             let operatingYear = variables.annualProductionGPU;
             let electricityGeneration = variables.annualProductionGPU * resultElectricPower;
             let usefulOutputElectricity = maxOutputPowerGPES * variables.annualProductionGPU;
             let thermalGeneration = 0
-            if(execution.value === 'containerHeatRecovery') {
+            if (execution.value === 'containerHeatRecovery') {
                 let intermediateResult = amountValue * thermalPowerСalories;
-                if(useThermalEnergy.value === 'heatingSeason') {
-                    if(operatingTime < variables.annualProductionGPU) {
-                        if(operatingYear < 2520) {
+                if (useThermalEnergy.value === 'heatingSeason') {
+                    if (operatingTime < variables.annualProductionGPU) {
+                        if (operatingYear < 2520) {
                             thermalGeneration = operatingYear * intermediateResult
-                        } else if(operatingYear < 6988) {
+                        } else if (operatingYear < 6988) {
                             thermalGeneration = 2520 * intermediateResult
                         } else {
                             thermalGeneration = (operatingYear - 4368) * intermediateResult;
@@ -814,8 +833,8 @@ export default function Calculator() {
             let totalСostsOil = oilСonsumption * resultObj.resultTariffArr[3].years[i - 1]
 
             let totalСostsMaintenanceSumm = 0
-            for(let j = 0; j < 8; j++) {
-                if(maintenanceData[j].years[i - 1] > 0) {
+            for (let j = 0; j < 8; j++) {
+                if (maintenanceData[j].years[i - 1] > 0) {
                     totalСostsMaintenanceSumm += (maintenanceData[j].spareParts + maintenanceData[j].work) * maintenanceData[j].years[i - 1] * amountValue;
                 }
             }
@@ -850,12 +869,12 @@ export default function Calculator() {
             sumsCostPriceArr.totalСostsMaintenance += totalСostsMaintenance
 
             /****************************************************** */
-            
+
             //переменные окупаемости
             let purchaseElectricity = usefulOutputElectricity * resultObj.resultTariffArr[1].years[i - 1]
 
             let purchaseThermalEnergy = 0
-            if(priceThermalEnergyValue == 0) {
+            if (priceThermalEnergyValue == 0) {
                 purchaseThermalEnergy = thermalGeneration * 140 * resultObj.resultTariffArr[0].years[i - 1]
             } else {
                 purchaseThermalEnergy = thermalGeneration * resultObj.resultTariffArr[2].years[i - 1]
@@ -865,34 +884,34 @@ export default function Calculator() {
             let savingsElectricity = purchaseElectricity - totalСosts
 
             let savingsThermalEnergy = 0
-            if(priceThermalEnergyValue == 0) {
+            if (priceThermalEnergyValue == 0) {
                 savingsThermalEnergy = thermalGeneration * 125 * resultObj.resultTariffArr[0].years[i - 1]
-                
+
             } else {
                 savingsThermalEnergy = thermalGeneration * resultObj.resultTariffArr[2].years[i - 1]
             }
 
             let resultSavings = savingsElectricity + savingsThermalEnergy
-            
+
             let economicEffect = 0
-            if(i > 1) {
-                if(resultPaybackArr[6].years[i - 2] + resultSavings < resultSavings ) {
+            if (i > 1) {
+                if (resultPaybackArr[6].years[i - 2] + resultSavings < resultSavings) {
                     economicEffect = resultPaybackArr[6].years[i - 2] + resultSavings
                 } else {
                     economicEffect = resultSavings
-                }                
+                }
             } else {
-                if(resultSavings - capex < 0 ) {
+                if (resultSavings - capex < 0) {
                     economicEffect = resultSavings - capex
                 } else {
                     economicEffect = resultSavings
                 }
             }
 
-            let resultPayback =  Math.abs(economicEffect / resultSavings)
-            if(economicEffect / resultSavings < 0) {
+            let resultPayback = Math.abs(economicEffect / resultSavings)
+            if (economicEffect / resultSavings < 0) {
                 resultPayback = 1;
-            } else if(economicEffect / resultSavings === 1) {
+            } else if (economicEffect / resultSavings === 1) {
                 resultPayback = 0
             }
 
@@ -932,7 +951,7 @@ export default function Calculator() {
         resultTepArr.forEach((item, index) => {
             item.sum = sumsTepArr[Object.keys(sumsTepArr)[index]]
         })
-        
+
         // добавляем массив ТЭП в результирующий объект
         resultObj.resultTepArr = resultTepArr
 
@@ -967,17 +986,17 @@ export default function Calculator() {
                 data: [
                     {
                         id: 'generationElectricalEnergy',
-                        name: 'выработка электрической энергии генераторами, кВтч/год',
+                        name: 'выработка электрической энергии генераторами, кВт*ч/год',
                         value: resultTepArr[2].years[0],
                     },
                     {
                         id: 'consumptionElectricalEnergy',
-                        name: 'потребление электрической энергии на собственные нужды энергоцентра, кВтч/год',
+                        name: 'потребление электрической энергии на собственные нужды энергоцентра, кВт*ч/год',
                         value: resultTepArr[2].years[0] - resultTepArr[3].years[0],
                     },
                     {
                         id: 'releaseElectricalEnergy',
-                        name: 'отпуск электрической энергии в сеть предприятия, кВтч/год',
+                        name: 'отпуск электрической энергии в сеть предприятия, кВт*ч/год',
                         value: resultTepArr[3].years[0],
                     },
                 ]
@@ -999,38 +1018,38 @@ export default function Calculator() {
                 data: [
                     {
                         id: 'consumptionGas',
-                        name: 'потребление природного газа генераторами, нм3/год',
+                        name: 'потребление природного газа генераторами, Нм3/год',
                         value: resultTepArr[5].years[0],
                     },
                 ]
-            }, 
+            },
             {
                 id: 'Payback',
                 name: 'Окупаемость',
                 data: [
                     {
                         id: 'averageElectricalEnergyСosts',
-                        name: 'Средние затраты за расчетный период на приобретение электрической энергии в год у сбытовой компании, Рубли',
+                        name: 'Средние затраты за расчетный период на приобретение электрической энергии в год у сбытовой компании, руб. без НДС',
                         value: Math.round(resultPaybackArr[0].sum / resultPaybackArr[0].years.length) + ' ₽',
                     },
                     {
                         id: 'averageThermalEnergyСosts',
-                        name: 'Средние затраты за расчетный период на приобретение тепловой энергии в год у сбытовой компании, Рубли',
+                        name: 'Средние затраты за расчетный период на приобретение тепловой энергии в год у сбытовой компании, руб. без НДС',
                         value: Math.round(resultPaybackArr[1].sum / resultPaybackArr[1].years.length) + ' ₽',
                     },
                     {
                         id: 'totalEnergyCosts',
-                        name: 'Итого затраты на приобретение энергоносителей, Рубли',
+                        name: 'Итого затраты на приобретение энергоносителей, руб. без НДС',
                         value: Math.round((resultPaybackArr[0].sum / resultPaybackArr[0].years.length) + (resultPaybackArr[1].sum / resultPaybackArr[1].years.length)) + ' ₽',
                     },
                     {
                         id: 'averageEnergyProductionCosts',
-                        name: 'Средние затраты за расчетный период на производство электрической и тепловой энергии на собственном энергоцентре, Рубли',
+                        name: 'Средние затраты за расчетный период на производство электрической и тепловой энергии на собственном энергоцентре, руб. без НДС',
                         value: Math.round(resultCostPriceArr[0].sum / resultPaybackArr[0].years.length) + ' ₽',
                     },
                     {
                         id: 'averageSavings',
-                        name: 'Средняя за расчетный период ежегодная экономия, Рубли',
+                        name: 'Средняя за расчетный период ежегодная экономия, руб. без НДС',
                         value: Math.round(resultPaybackArr[5].sum / resultPaybackArr[5].years.length) + ' ₽',
                     },
                     {
@@ -1039,7 +1058,7 @@ export default function Calculator() {
                         value: floatToYearsMonths(resultPaybackArr[7].sum),
                     }
                 ]
-            },           
+            },
         ]
 
         // добавляем массив годовых показателей в результирующий объект
@@ -1080,7 +1099,7 @@ export default function Calculator() {
     // подключение адаптивных стилей
     const windowWidth = useRef(window.innerWidth);
 
-    if(windowWidth.current < 1200) {
+    if (windowWidth.current < 1200) {
         styles.calculatorResults.flexDirection = 'column'
         styles.schedule.flex = '0 0 auto'
         styles.schedule.width = '100%'
@@ -1089,30 +1108,30 @@ export default function Calculator() {
         styles.diagram.maxWidth = '650px'
     }
 
-	return (
-		<main> 
-			<section style={styles.calculator}>
-				<div style={styles.container}>
-					<h1  style={styles.calculatorTitle}>Калькулятор ТЭП</ h1>
-					<form onSubmit={e => formValidate(e)} action="" noValidate style={styles.calculatorForm}>
-						<div style={styles.formField}>
-                            <label htmlFor="exchangeRatesRubCny">Курс рубля к ЮАНЬ (руб.)</label>
+    return (
+        <main>
+            <section style={styles.calculator}>
+                <div style={styles.container}>
+                    <h1 style={styles.calculatorTitle}>Калькулятор ТЭП</ h1>
+                    <form onSubmit={e => formValidate(e)} action="" noValidate style={styles.calculatorForm}>
+                        <div style={styles.formField}>
+                            <label htmlFor="exchangeRatesRubCny">Курс рубля к ЮАНЬ</label>
                             <input type="input" id="exchangeRatesRubCny" value={exchangeRatesRubCny.value} onChange={exchangeRatesRubCny.onChange} style={!exchangeRatesRubCny.error ? styles.inputAndSelect : styles.inputAndSelectError} />
-						</div>
+                        </div>
 
-						<div style={styles.formField}>
+                        <div style={styles.formField}>
                             <label htmlFor="nominalElectricalPower">Номин. эл. мощность ГПУ</label>
                             <select name="" id="nominalElectricalPower" value={nominalElectricalPower.value} onChange={nominalElectricalPower.onChange} style={styles.inputAndSelect}>
                                 <option value="1100">1100 кВт</option>
                                 <option value="1500">1500 кВт</option>
                                 <option value="2000">2000 кВт</option>
                             </select>
-						</div>
-						
-						<div style={styles.formField}>
-                            <label htmlFor="amount">Количество (шт.)</label>
-                            <input type="input" id="amount" value={amount.value} onChange={amount.onChange} style={!amount.error ? styles.inputAndSelect : styles.inputAndSelectError}/>
-						</div>
+                        </div>
+
+                        <div style={styles.formField}>
+                            <label htmlFor="amount">Количество ГПУ</label>
+                            <input type="input" id="amount" value={amount.value} onChange={amount.onChange} style={!amount.error ? styles.inputAndSelect : styles.inputAndSelectError} />
+                        </div>
 
                         <div style={styles.formField}>
                             <label htmlFor="execution">Исполнение</label>
@@ -1121,37 +1140,46 @@ export default function Calculator() {
                                 <option value="container">Контейнерное</option>
                                 <option value="containerHeatRecovery">Контейнерное с утилизацией тепла</option>
                             </select>
-						</div>
+                        </div>
+
+                        {
+                            execution.value === 'containerHeatRecovery' &&
+                            <div style={styles.formField}>
+                                <label htmlFor="useThermalEnergy">Использование тепловой энергии ГПУ</label>
+                                <select name="" id="UseThermalEnergy" value={useThermalEnergy.value} onChange={useThermalEnergy.onChange} style={styles.inputAndSelect}>
+                                    <option value="allEYear">Круглый год</option>
+                                    <option value="heatingSeason">Отопительный сезон</option>
+                                </select>
+                            </div>
+                        }
 
                         <div style={styles.formField}>
-                            <label htmlFor="useThermalEnergy">Использование тепловой энергии ГПУ</label>
-                            <select name="" id="UseThermalEnergy" value={useThermalEnergy.value} onChange={useThermalEnergy.onChange} style={styles.inputAndSelect}>
-                                <option value="allEYear">Круглый год</option>
-                                <option value="heatingSeason">Отопительный сезон</option>
-                            </select>
-						</div>
+                            <label htmlFor="gasPrice">Стоимость 1 нм3 газа, руб. без НДС</label>
+                            <input type="input" id="gasPrice" value={gasPrice.value} onChange={gasPrice.onChange} style={!gasPrice.error ? styles.inputAndSelect : styles.inputAndSelectError} />
+                        </div>
 
                         <div style={styles.formField}>
-                            <label htmlFor="gasPrice">Стоимость 1 нм3 газа (в рублях без НДС)</label>
-                            <input type="input" id="gasPrice" value={gasPrice.value} onChange={gasPrice.onChange} style={!gasPrice.error ? styles.inputAndSelect : styles.inputAndSelectError}/>
-						</div>
+                            <label htmlFor="priceElectricity">Стимость 1 кВт э/э, руб. без НДС</label>
+                            <input type="input" id="priceElectricity" value={priceElectricity.value} onChange={priceElectricity.onChange} style={!priceElectricity.error ? styles.inputAndSelect : styles.inputAndSelectError} />
+                        </div>
 
-                        <div style={styles.formField}>
-                            <label htmlFor="priceElectricity">Стимость 1 кВт э/э (в рублях без НДС)</label>
-                            <input type="input" id="priceElectricity" value={priceElectricity.value} onChange={priceElectricity.onChange} style={!priceElectricity.error ? styles.inputAndSelect : styles.inputAndSelectError}/>
-						</div>
+                        {
+                            execution.value === 'containerHeatRecovery' &&
+                            <div style={styles.formField}>
+                                <label htmlFor="priceThermalEnergy">Стимость 1 Гкал т/э, руб. без НДС</label>
+                                <input type="input" id="priceThermalEnergy" value={priceThermalEnergy.value} onChange={priceThermalEnergy.onChange} style={!priceThermalEnergy.error ? styles.inputAndSelect : styles.inputAndSelectError} />
+                            </div>
+                        }
 
-                        <div style={styles.formField}>
-                            <label htmlFor="priceThermalEnergy">Стимость 1 Гкал т/э (руб.)</label>
-                            <input type="input" id="priceThermalEnergy" value={priceThermalEnergy.value} onChange={priceThermalEnergy.onChange} style={!priceThermalEnergy.error ? styles.inputAndSelect : styles.inputAndSelectError}/>
-						</div>
+                        <Button type="submit" classes="btn form__btn" style={styles.btn}>Рассчитать</Button>
+                    </form>
 
-						<Button type="submit" classes="btn form__btn" style={styles.btn}>Рассчитать</Button>
-					</form>
+                    <FinalData costTechChars={finalCostTechChars} annualIndicators={finalAnnualIndicators} energyProductionСostsDiagram={energyProductionСostsDiagram} energyСostsDiagram={energyСostsDiagram} />
+                    <ContactUs />
 
-                    <FinalData costTechChars={finalCostTechChars} annualIndicators={finalAnnualIndicators} energyProductionСostsDiagram={energyProductionСostsDiagram} energyСostsDiagram={energyСostsDiagram}/>
+                    {/*Таблицы с промежуточными результатами
 
-					<InitialDataTable title='Исходные данные' data={initialData} />
+                    <InitialDataTable title='Исходные данные' data={initialData} />
 
                     <TariffTable title="Тарифы" data={tariffData} />
 
@@ -1160,18 +1188,21 @@ export default function Calculator() {
                     <TepTable title="Расчет технико-экономических показателей до капитального ремонта" data={tepData} />
 
                     <CostPriceTable title="Расчет себестоимости выработанной ГПУ электроэнергии" data={costPriceData} />
-                    
-                    <PaybackTable title="Расчет простого срока окупаемости" data={paybackData} />
 
-				</div>
-			</section>
-		</main>
-	)
+                    <PaybackTable title="Расчет простого срока окупаемости" data={paybackData} />
+                    
+                    */}
+
+
+                </div>
+            </section>
+        </main>
+    )
 
     // Валидация формы
-	function formValidate(e) {
-		e.preventDefault();
-		if(
+    function formValidate(e) {
+        e.preventDefault();
+        if (
             exchangeRatesRubCny.error
             || nominalElectricalPower.error
             || amount.error
@@ -1181,13 +1212,13 @@ export default function Calculator() {
             || priceElectricity.error
             || priceThermalEnergy.error
         ) {
-			console.log("ошибка")
-		} else {
-			calculate()
-		}
-	}
-    
-    function calculate() { 
+            console.log("ошибка")
+        } else {
+            calculate()
+        }
+    }
+
+    function calculate() {
         calculatorResult = getTepData()
         setInitialData(calculatorResult.resultInitialData)
         setTariffData(calculatorResult.resultTariffArr)
@@ -1204,11 +1235,11 @@ export default function Calculator() {
 // Компоненты
 function Button({ children, type, ...props }) {
     return (
-      <button type={type} {...props}>{children}</button> 
+        <button type={type} {...props}>{children}</button>
     )
 }
 
-function InitialDataTable({ title, data}) {
+function InitialDataTable({ title, data }) {
 
     return (
         <div style={styles.initialResults}>
@@ -1221,7 +1252,7 @@ function InitialDataTable({ title, data}) {
                                 <div style={styles.tableCol}>{item.name}</div>
                                 <div style={styles.tableCol}>
                                     <span>{item.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span>
-                                    {item.value2 ?  <span>{item.value2.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span> : null}
+                                    {item.value2 ? <span>{item.value2.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span> : null}
                                 </div>
                             </div>
                         )
@@ -1245,10 +1276,10 @@ function InitialDataTable({ title, data}) {
                 </div>
             </div>
         </div>
-	)
+    )
 }
 
-function TariffTable({title, data}) {
+function TariffTable({ title, data }) {
 
     return (
         <div style={styles.detailedResults}>
@@ -1280,7 +1311,7 @@ function TariffTable({title, data}) {
                                             <div style={styles.detailedTableCol} key={'year' + index}>{(Math.round(indexItem * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</div>
                                         )
                                     })
-                                } 
+                                }
                             </div>
                         )
                     })
@@ -1290,7 +1321,7 @@ function TariffTable({title, data}) {
     )
 }
 
-function MaintenanceTable({title, data}) {
+function MaintenanceTable({ title, data }) {
 
     return (
         <div style={styles.detailedResults}>
@@ -1314,17 +1345,17 @@ function MaintenanceTable({title, data}) {
                     data.map(item => {
                         return (
                             <div style={styles.tableRow} key={item.id}>
-                                { 
-                                
+                                {
+
                                     item.spareParts && item.work ? (
                                         <>
-                                        <div style={styles.maintenanceTableCol}>{item.name}</div>
-                                        <div style={styles.maintenanceTableCol}>{item.spareParts !== '0' ? Math.round(item.spareParts).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
-                                        <div style={styles.maintenanceTableCol}>{item.work !== '0' ? Math.round(item.work).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
+                                            <div style={styles.maintenanceTableCol}>{item.name}</div>
+                                            <div style={styles.maintenanceTableCol}>{item.spareParts !== '0' ? Math.round(item.spareParts).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
+                                            <div style={styles.maintenanceTableCol}>{item.work !== '0' ? Math.round(item.work).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
                                         </>
-                                        ) : (
-                                            <div style={styles.maintenanceTableCol3}>{item.name}</div>
-                                        )
+                                    ) : (
+                                        <div style={styles.maintenanceTableCol3}>{item.name}</div>
+                                    )
                                 }
                                 {
                                     item.years.map((innerItem, index) => {
@@ -1343,7 +1374,7 @@ function MaintenanceTable({title, data}) {
     )
 }
 
-function TepTable({title, data}) {
+function TepTable({ title, data }) {
 
     return (
         <div style={styles.detailedResults}>
@@ -1383,7 +1414,7 @@ function TepTable({title, data}) {
     )
 }
 
-function CostPriceTable({title, data}) {
+function CostPriceTable({ title, data }) {
 
     return (
         <div style={styles.detailedResults}>
@@ -1411,7 +1442,7 @@ function CostPriceTable({title, data}) {
                                         return (
                                             index < 4 ?
                                                 <div style={styles.maintenanceTableCol} key={innerIndex}>{Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
-                                            :
+                                                :
                                                 <div style={styles.maintenanceTableCol} key={innerIndex}>{(Math.round(innerItem * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
                                         )
                                     })
@@ -1419,7 +1450,7 @@ function CostPriceTable({title, data}) {
                                 {
                                     index < 4 ?
                                         <div style={styles.maintenanceTableCol}>{Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
-                                    :
+                                        :
                                         <div style={styles.maintenanceTableCol}>{(Math.round(item.sum * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} &#8381;</div>
                                 }
                             </div>
@@ -1431,7 +1462,7 @@ function CostPriceTable({title, data}) {
     )
 }
 
-function PaybackTable({title, data}) {
+function PaybackTable({ title, data }) {
 
     return (
         <div style={styles.detailedResults}>
@@ -1454,30 +1485,30 @@ function PaybackTable({title, data}) {
                         return (
                             <div style={styles.tableRow} key={item.id}>
                                 {
-                                index != data.length - 1 ?
-                                <div style={styles.maintenanceTableCol3}>{item.name}</div>
-                                :
-                                <div style={styles.maintenanceTableCol3}>
-                                    <span>{item.name}</span>
-                                    <span>{floatToYearsMonths(item.sum)}</span>
-                                </div>
+                                    index != data.length - 1 ?
+                                        <div style={styles.maintenanceTableCol3}>{item.name}</div>
+                                        :
+                                        <div style={styles.maintenanceTableCol3}>
+                                            <span>{item.name}</span>
+                                            <span>{floatToYearsMonths(item.sum)}</span>
+                                        </div>
                                 }
                                 {
                                     item.years.map((innerItem, innerIndex) => {
                                         return (
 
                                             index != data.length - 1 ?
-                                            <div style={styles.maintenanceTableCol} key={innerIndex}>{innerItem !== 0 ? Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")  + ' ₽' : '-'}</div>
-                                            :
-                                            <div style={styles.maintenanceTableCol} key={innerIndex}>{innerItem !== 0 ? Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
+                                                <div style={styles.maintenanceTableCol} key={innerIndex}>{innerItem !== 0 ? Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
+                                                :
+                                                <div style={styles.maintenanceTableCol} key={innerIndex}>{innerItem !== 0 ? Math.round(innerItem).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
                                         )
                                     })
                                 }
                                 {
                                     index != data.length - 1 ?
-                                    <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")  + ' ₽' : '-'}</div>
-                                    :
-                                    <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
+                                        <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽' : '-'}</div>
+                                        :
+                                        <div style={styles.maintenanceTableCol}>{item.sum !== 0 ? Math.round(item.sum).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</div>
                                 }
                             </div>
                         )
@@ -1488,7 +1519,7 @@ function PaybackTable({title, data}) {
     )
 }
 
-function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiagram, energyСostsDiagram}) {
+function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiagram, energyСostsDiagram }) {
 
     let styles = {
         finalContainer: {
@@ -1579,7 +1610,7 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
         <div style={styles.finalContainer}>
             <div style={styles.finalTables}>
                 <div>
-                    <div  style={styles.finalTableTitle}>Стоимость и основные технические характеристики</div>
+                    <div style={styles.finalTableTitle}>Стоимость и основные технические характеристики</div>
                     <div style={styles.finalTable}>
                         {
                             costTechChars.map((item, index) => {
@@ -1596,7 +1627,7 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
                     </div>
                 </div>
                 <div>
-                    <div  style={styles.finalTableTitle}>Расчетные годовые показатели при годовой наработке 8000 рабочих часов</div>
+                    <div style={styles.finalTableTitle}>Расчетные годовые показатели при годовой наработке 8000 рабочих часов</div>
                     <div style={styles.finalTable}>
                         {
                             annualIndicators.map(item => {
@@ -1613,17 +1644,17 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
                                                         <div style={styles.finalTableCol2}>
                                                             {
                                                                 item.id !== 'Payback' ?
-                                                                    <span>{dataItem.value !== 0  ? Math.round(dataItem.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</span>
-                                                                :
+                                                                    <span>{dataItem.value !== 0 ? Math.round(dataItem.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : '-'}</span>
+                                                                    :
                                                                     <span>{dataItem.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span>
                                                             }
                                                         </div>
-                                                    </div> 
+                                                    </div>
                                                 )
                                             })
                                         }
                                     </div>
-                                
+
                                 )
                             })
                         }
@@ -1631,7 +1662,7 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
                 </div>
             </div>
             <div style={styles.diagrams}>
-                
+
                 <Bar
                     data={energyProductionСostsDiagram}
                     options={
@@ -1647,14 +1678,14 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
                             },
                             scales: {
                                 x: {
-                                stacked: true,
+                                    stacked: true,
                                 },
                                 y: {
-                                stacked: true,
+                                    stacked: true,
                                 },
                             },
                         }
-                    }  
+                    }
                 />
                 <Line
                     data={energyСostsDiagram}
@@ -1672,11 +1703,45 @@ function FinalData({ costTechChars, annualIndicators, energyProductionСostsDiag
                         }
                     }
                 />
-                
+
             </div>
         </div>
-	)
+    )
 }
+
+const ContactUs = () => {
+    const form = useRef();
+
+    const sendEmail = (e) => {
+        e.preventDefault();
+
+        emailjs
+            .sendForm('service_fk2au8l', 'template_5dpkual', form.current, {
+                publicKey: 'u6M72Gas8O_pbM_JD',
+            })
+            .then(
+                () => {
+                    console.log('SUCCESS!');
+                },
+                (error) => {
+                    console.log('FAILED...', error.text);
+                },
+            );
+    };
+
+    return (
+        <form ref={form} onSubmit={sendEmail}>
+
+            <input type="text" name="user_name" />
+
+            <input type="email" name="user_email" />
+
+            <textarea name="message" />
+            <input type="submit" value="Send" />
+        </form>
+    );
+};
+
 
 /**********Статичные данные ******************/
 
@@ -1729,9 +1794,9 @@ const modelsData = [
         oilVolumeCrankcase: 240,
         antifreezeVolume: 180,
         installationCost: {
-            open:  3418320,
-            container:  4552800,
-            containerHeatRecovery:  4834800
+            open: 3418320,
+            container: 4552800,
+            containerHeatRecovery: 4834800
         },
         costSpareParts: {
             w10: 2448.6,
@@ -1779,7 +1844,7 @@ const modelsData = [
             turbineRepair: 96880,
             generatorRepair: 84000,
         },
-        costWork: {    
+        costWork: {
             w10: 28000,
             w30: 56000,
             w40: 56000,
@@ -1799,7 +1864,7 @@ const variables = {
     hoursHeatUsage: 4392,
     w70Coast: false,
     oilPrice: 450,
-    antifreezePrice: 300, 
+    antifreezePrice: 300,
     oilResource: 3000,
     indexing: {
         gas: 2,
@@ -1815,7 +1880,7 @@ const maintenance = {
     w10: [50, 16050, 32050, 48050],
     w30: [2000, 6000, 10000, 14000, 18000, 22000, 26000, 30000, 34000, 38000, 42000, 46000, 50000, 54000, 58000, 62000],
     w40: [4000, 8000, 12000, 20000, 24000, 28000, 36000, 40000, 44000, 52000, 56000, 60000],
-    w50: [16000, 48000],   
+    w50: [16000, 48000],
     w60: [32000],
     w70: [64000],
     turbines: [12000, 24000, 36000, 48000, 60000],
@@ -1830,7 +1895,7 @@ function calculateIndexingArr(startPrice, indexing) {
     let acc = startPrice * indexing + startPrice;
     let i;
     let resultArr = []
-    for(i = 1; i <= 8; i++ ) {
+    for (i = 1; i <= 8; i++) {
         resultArr.push(acc)
         acc = acc * indexing + acc
     }
@@ -1842,7 +1907,7 @@ function calculateIndexingArr(startPrice, indexing) {
 function distributionMaintenanceYear(maintenanceArr, annualOperatingTime) {
     let resultArr = [];
 
-    for(let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 8; i++) {
         let filteredArr = maintenanceArr.filter(item => item > annualOperatingTime * i - annualOperatingTime && item <= annualOperatingTime * i);
         resultArr.push(filteredArr.length)
     }
@@ -1856,13 +1921,13 @@ function getOilYears() {
     let annualProductionGPU = variables.annualProductionGPU;
     let oilResource = variables.oilResource;
 
-    for(let i = 0; i < 8; i++) {
-        if(i === 0) {
+    for (let i = 0; i < 8; i++) {
+        if (i === 0) {
             resultArr.push(Math.floor(annualProductionGPU / oilResource))
-        } else if(i === 7) {
-            resultArr.push(Math.floor((annualProductionGPU * (i+1) - (Math.floor(annualProductionGPU * i / oilResource) * oilResource)) / oilResource) - 1)
+        } else if (i === 7) {
+            resultArr.push(Math.floor((annualProductionGPU * (i + 1) - (Math.floor(annualProductionGPU * i / oilResource) * oilResource)) / oilResource) - 1)
         } else {
-            resultArr.push(Math.floor((annualProductionGPU * (i+1) - (Math.floor(annualProductionGPU * i / oilResource) * oilResource)) / oilResource))
+            resultArr.push(Math.floor((annualProductionGPU * (i + 1) - (Math.floor(annualProductionGPU * i / oilResource) * oilResource)) / oilResource))
         }
     }
 
@@ -1870,25 +1935,24 @@ function getOilYears() {
 }
 
 //преобразование десятичных дробей чисел в годы и месяцы
-function floatToYearsMonths(value)
-{
+function floatToYearsMonths(value) {
     var totalDays = value * 365;
-    var years = Math.floor(totalDays/365);
-    var months = Math.floor((totalDays-(years *365))/30);
+    var years = Math.floor(totalDays / 365);
+    var months = Math.floor((totalDays - (years * 365)) / 30);
     var yearsText = numWord(years, ['год', 'года', 'лет']);
     var monthsText = numWord(months, ['месяц', 'месяца', 'месяцев']);
 
-    var result = years  === 0 && months === 0 ? years + " " + yearsText : (years > 0 ? years + " " + yearsText + " " : '') + (months > 0 ? months + " " + monthsText : '');
+    var result = years === 0 && months === 0 ? years + " " + yearsText : (years > 0 ? years + " " + yearsText + " " : '') + (months > 0 ? months + " " + monthsText : '');
 
     return result
 }
 
 //склонение числительных
-function numWord(value, words) {  
-	value = Math.abs(value) % 100; 
-	var num = value % 10;
-	if(value > 10 && value < 20) return words[2]; 
-	if(num > 1 && num < 5) return words[1];
-	if(num == 1) return words[0]; 
-	return words[2];
+function numWord(value, words) {
+    value = Math.abs(value) % 100;
+    var num = value % 10;
+    if (value > 10 && value < 20) return words[2];
+    if (num > 1 && num < 5) return words[1];
+    if (num == 1) return words[0];
+    return words[2];
 }
