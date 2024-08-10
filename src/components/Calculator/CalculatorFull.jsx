@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from "react"
 
 import { Chart as ChartJS } from "chart.js/auto"
 import { Bar, Line } from "react-chartjs-2"
+import { color } from "chart.js/helpers"
 
 ChartJS.register()
 
@@ -286,8 +287,7 @@ let styles = {
         flex: "1 0 30%",
         boxSizing: "border-box",
         color: "#005CA9",
-        minHeight: "18px",
-        textAlign: "end"
+        minHeight: "18px"
     },
 
     finalTableBlock: {
@@ -467,6 +467,115 @@ let styles = {
         border: "none",
         cursor: "pointer",
         transition: "background-color 0.2s ease",
+        boxSizing: "border-box",
+    },
+
+    /* таблицы промежуточных результатов */
+    initialResults: {
+        marginTop: "50px",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        flexWrap: "wrap",
+        gap: "0 30px",
+        boxSizing: "border-box",
+    },
+
+    detailedResults: {
+        marginTop: "50px",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        flexWrap: "wrap",
+        gap: "0 30px",
+        boxSizing: "border-box",
+    },
+
+    resultsTitle: {
+        flexBasis: "100%",
+        fontSize: "35px",
+        lineHeight: "1.1",
+        boxSizing: "border-box",
+    },
+
+    scheduleTable: {
+        fontSize: "14px",
+        lineHeight: "1.2em",
+        fontWeight: "400",
+        borderTop: "1px solid lightgrey",
+        flexBasis: "50%",
+        maxWidth: "650px",
+        marginTop: "30px",
+        boxSizing: "border-box",
+    },
+
+    detailedTable: {
+        fontSize: "14px",
+        lineHeight: "1.2em",
+        fontWeight: "400",
+        borderTop: "1px solid lightgrey",
+        flexBasis: "100%",
+        maxWidth: "1330px",
+        marginTop: "30px",
+        boxSizing: "border-box",
+    },
+
+    tableRow: {
+        display: "flex",
+        alignItems: "stretch",
+        borderLeft: "1px solid lightgrey",
+        boxSizing: "border-box",
+    },
+
+    tableCol: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "5px 10px",
+        flexShrink: "0",
+        flexGrow: "0",
+        flexBasis: "50%",
+        borderRight: "1px solid lightgrey",
+        borderBottom: "1px solid lightgrey",
+        boxSizing: "border-box",
+    },
+
+    detailedTableCol: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "5px 10px",
+        flexShrink: "1",
+        flexGrow: "1",
+        flexBasis: "calc(100% / 11)",
+        borderRight: "1px solid lightgrey",
+        borderBottom: "1px solid lightgrey",
+        boxSizing: "border-box",
+    },
+
+    maintenanceTableCol: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "5px 10px",
+        flexShrink: "0",
+        flexGrow: "0",
+        flexBasis: "calc(100% / 12)",
+        borderRight: "1px solid lightgrey",
+        borderBottom: "1px solid lightgrey",
+        boxSizing: "border-box",
+    },
+
+    maintenanceTableCol3: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "5px 10px",
+        flexShrink: "0",
+        flexGrow: "0",
+        flexBasis: "calc(100% / 12 * 3)",
+        borderRight: "1px solid lightgrey",
+        borderBottom: "1px solid lightgrey",
         boxSizing: "border-box",
     },
 
@@ -768,6 +877,29 @@ export default function Calculator() {
     let calculatorResult = useMemo(() => {
         return getTepData()
     }, [])
+
+    //массив исходных данных
+    const [initialData, setInitialData] = useState(
+        calculatorResult.resultInitialData
+    )
+
+    //массив тарифов
+    const [tariffData, setTariffData] = useState(
+        calculatorResult.resultTariffArr
+    )
+
+    //массив ТЭП до кап. ремонта
+    const [tepData, setTepData] = useState(calculatorResult.resultTepArr)
+
+    //массив себестоимости
+    const [costPriceData, setCostPriceData] = useState(
+        calculatorResult.resultCostPriceArr
+    )
+
+    //массив окупаемости
+    const [paybackData, setPaybackData] = useState(
+        calculatorResult.resultPaybackArr
+    )
 
     //Массив итоговой сотимости и технических характеристик
     const [finalCostTechChars, setFinalCostTechChars] = useState(
@@ -2033,6 +2165,22 @@ export default function Calculator() {
                             energyСostsDiagram={energyСostsDiagram}
                         />
                     ) : null}
+
+                    {/*Таблицы с промежуточными результатами
+
+                    <InitialDataTable title='Исходные данные' data={initialData} />
+
+                    <TariffTable title="Тарифы" data={tariffData} />
+
+                    <MaintenanceTable title="Техническое обслуживание" data={maintenanceData} />
+
+                    <TepTable title="Расчет технико-экономических показателей до капитального ремонта" data={tepData} />
+
+                    <CostPriceTable title="Расчет себестоимости выработанной ГПУ электроэнергии" data={costPriceData} />
+
+                    <PaybackTable title="Расчет простого срока окупаемости" data={paybackData} />
+                    
+                    */}
                 </div>
             </section>
         </main>
@@ -2069,8 +2217,12 @@ export default function Calculator() {
     function calculate() {
         setFinalDataVisibility(true)
         setCalculateFormVisibility(false)
-        window.scrollTo(0, 0)
         calculatorResult = getTepData()
+        setInitialData(calculatorResult.resultInitialData)
+        setTariffData(calculatorResult.resultTariffArr)
+        setTepData(calculatorResult.resultTepArr)
+        setCostPriceData(calculatorResult.resultCostPriceArr)
+        setPaybackData(calculatorResult.resultPaybackArr)
         setFinalCostTechChars(calculatorResult.finalCostTechCharsArr)
         setFinalAnnualIndicators(calculatorResult.finalAnnualIndicatorsArr)
         setEnergyProductionСostsDiagram(
@@ -2276,6 +2428,434 @@ function FinalData({
                         />
                     </div>
                 </div>
+            </div>
+        </div>
+    )
+}
+
+function InitialDataTable({ title, data }) {
+    return (
+        <div style={styles.initialResults}>
+            <h2 style={styles.resultsTitle}>{title}</h2>
+            <div style={styles.scheduleTable}>
+                {data.map((item) => {
+                    return (
+                        <div style={styles.tableRow} key={item.id}>
+                            <div style={styles.tableCol}>{item.name}</div>
+                            <div style={styles.tableCol}>
+                                <span>
+                                    {item.value
+                                        .toString()
+                                        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                                </span>
+                                {item.value2 ? (
+                                    <span>
+                                        {item.value2
+                                            .toString()
+                                            .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                " "
+                                            )}
+                                    </span>
+                                ) : null}
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+            <div style={styles.scheduleTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.tableCol}>Годовая наработка ГПУ</div>
+                    <div style={styles.tableCol}>
+                        {variables.annualProductionGPU
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " мч"}
+                    </div>
+                </div>
+
+                <div style={styles.tableRow}>
+                    <div style={styles.tableCol}>Часы использования тепла</div>
+                    <div style={styles.tableCol}>
+                        {variables.hoursHeatUsage
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " мч"}
+                    </div>
+                </div>
+
+                <div style={styles.tableRow}>
+                    <div style={styles.tableCol}>Стоимость W70</div>
+                    <div style={styles.tableCol}>
+                        {variables.w70Coast ? "включена" : "не включена"}
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function TariffTable({ title, data }) {
+    return (
+        <div style={styles.detailedResults}>
+            <h2 style={styles.resultsTitle} key={title}>
+                {title}
+            </h2>
+            <div style={styles.detailedTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.detailedTableCol}>Параметр</div>
+                    <div style={styles.detailedTableCol}>Тарифы</div>
+                    <div style={styles.detailedTableCol}>Индексация</div>
+                    <div style={styles.detailedTableCol}>1 год</div>
+                    <div style={styles.detailedTableCol}>2 год</div>
+                    <div style={styles.detailedTableCol}>3 год</div>
+                    <div style={styles.detailedTableCol}>4 год</div>
+                    <div style={styles.detailedTableCol}>5 год</div>
+                    <div style={styles.detailedTableCol}>6 год</div>
+                    <div style={styles.detailedTableCol}>7 год</div>
+                    <div style={styles.detailedTableCol}>8 год</div>
+                </div>
+                {data.map((item) => {
+                    return (
+                        <div style={styles.tableRow} key={item.id}>
+                            <div style={styles.detailedTableCol}>
+                                {item.name}
+                            </div>
+                            <div style={styles.detailedTableCol}>
+                                {item.price
+                                    .toString()
+                                    .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+                                &#8381;
+                            </div>
+                            <div style={styles.detailedTableCol}>
+                                {item.indexing}%
+                            </div>
+                            {item.years.map((indexItem, index) => {
+                                return (
+                                    <div
+                                        style={styles.detailedTableCol}
+                                        key={"year" + index}
+                                    >
+                                        {(Math.round(indexItem * 100) / 100)
+                                            .toString()
+                                            .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                " "
+                                            )}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+function MaintenanceTable({ title, data }) {
+    return (
+        <div style={styles.detailedResults}>
+            <h2 style={styles.resultsTitle} key={title}>
+                {title}
+            </h2>
+            <div style={styles.detailedTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.maintenanceTableCol}>Вид ТО</div>
+                    <div style={styles.maintenanceTableCol}>ЗиП</div>
+                    <div style={styles.maintenanceTableCol}>Работа</div>
+                    <div style={styles.maintenanceTableCol}>1 год</div>
+                    <div style={styles.maintenanceTableCol}>2 год</div>
+                    <div style={styles.maintenanceTableCol}>3 год</div>
+                    <div style={styles.maintenanceTableCol}>4 год</div>
+                    <div style={styles.maintenanceTableCol}>5 год</div>
+                    <div style={styles.maintenanceTableCol}>6 год</div>
+                    <div style={styles.maintenanceTableCol}>7 год</div>
+                    <div style={styles.maintenanceTableCol}>8 год</div>
+                    <div style={styles.maintenanceTableCol}>ИТОГО</div>
+                </div>
+                {data.map((item) => {
+                    return (
+                        <div style={styles.tableRow} key={item.id}>
+                            {item.spareParts && item.work ? (
+                                <>
+                                    <div style={styles.maintenanceTableCol}>
+                                        {item.name}
+                                    </div>
+                                    <div style={styles.maintenanceTableCol}>
+                                        {item.spareParts !== "0"
+                                            ? Math.round(item.spareParts)
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                ) + " ₽"
+                                            : "-"}
+                                    </div>
+                                    <div style={styles.maintenanceTableCol}>
+                                        {item.work !== "0"
+                                            ? Math.round(item.work)
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                ) + " ₽"
+                                            : "-"}
+                                    </div>
+                                </>
+                            ) : (
+                                <div style={styles.maintenanceTableCol3}>
+                                    {item.name}
+                                </div>
+                            )}
+                            {item.years.map((innerItem, index) => {
+                                return (
+                                    <div
+                                        style={styles.maintenanceTableCol}
+                                        key={index}
+                                    >
+                                        {innerItem > 0 ? innerItem : ""}
+                                    </div>
+                                )
+                            })}
+                            <div style={styles.maintenanceTableCol}>
+                                {item.count}
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+function TepTable({ title, data }) {
+    return (
+        <div style={styles.detailedResults}>
+            <h2 style={styles.resultsTitle} key={title}>
+                {title}
+            </h2>
+            <div style={styles.detailedTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.maintenanceTableCol3}>Показатель</div>
+                    <div style={styles.maintenanceTableCol}>1 год</div>
+                    <div style={styles.maintenanceTableCol}>2 год</div>
+                    <div style={styles.maintenanceTableCol}>3 год</div>
+                    <div style={styles.maintenanceTableCol}>4 год</div>
+                    <div style={styles.maintenanceTableCol}>5 год</div>
+                    <div style={styles.maintenanceTableCol}>6 год</div>
+                    <div style={styles.maintenanceTableCol}>7 год</div>
+                    <div style={styles.maintenanceTableCol}>8 год</div>
+                    <div style={styles.maintenanceTableCol}>ИТОГО</div>
+                </div>
+                {data.map((item) => {
+                    return (
+                        <div style={styles.tableRow} key={item.id}>
+                            <div style={styles.maintenanceTableCol3}>
+                                {item.name}
+                            </div>
+                            {item.years.map((innerItem, index) => {
+                                return (
+                                    <div
+                                        style={styles.maintenanceTableCol}
+                                        key={index}
+                                    >
+                                        {innerItem !== 0
+                                            ? Math.round(innerItem)
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                )
+                                            : "-"}
+                                    </div>
+                                )
+                            })}
+                            <div style={styles.maintenanceTableCol}>
+                                {item.sum !== 0
+                                    ? Math.round(item.sum)
+                                        .toString()
+                                        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+                                    : "-"}
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+function CostPriceTable({ title, data }) {
+    return (
+        <div style={styles.detailedResults}>
+            <h2 style={styles.resultsTitle} key={title}>
+                {title}
+            </h2>
+            <div style={styles.detailedTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.maintenanceTableCol3}>Показатель</div>
+                    <div style={styles.maintenanceTableCol}>1 год</div>
+                    <div style={styles.maintenanceTableCol}>2 год</div>
+                    <div style={styles.maintenanceTableCol}>3 год</div>
+                    <div style={styles.maintenanceTableCol}>4 год</div>
+                    <div style={styles.maintenanceTableCol}>5 год</div>
+                    <div style={styles.maintenanceTableCol}>6 год</div>
+                    <div style={styles.maintenanceTableCol}>7 год</div>
+                    <div style={styles.maintenanceTableCol}>8 год</div>
+                    <div style={styles.maintenanceTableCol}>ИТОГО</div>
+                </div>
+                {data.map((item, index) => {
+                    return (
+                        <div style={styles.tableRow} key={item.id}>
+                            <div style={styles.maintenanceTableCol3}>
+                                {item.name}
+                            </div>
+                            {item.years.map((innerItem, innerIndex) => {
+                                return index < 4 ? (
+                                    <div
+                                        style={styles.maintenanceTableCol}
+                                        key={innerIndex}
+                                    >
+                                        {Math.round(innerItem)
+                                            .toString()
+                                            .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                " "
+                                            )}{" "}
+                                        &#8381;
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={styles.maintenanceTableCol}
+                                        key={innerIndex}
+                                    >
+                                        {(Math.round(innerItem * 100) / 100)
+                                            .toString()
+                                            .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                " "
+                                            )}{" "}
+                                        &#8381;
+                                    </div>
+                                )
+                            })}
+                            {index < 4 ? (
+                                <div style={styles.maintenanceTableCol}>
+                                    {Math.round(item.sum)
+                                        .toString()
+                                        .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            " "
+                                        )}{" "}
+                                    &#8381;
+                                </div>
+                            ) : (
+                                <div style={styles.maintenanceTableCol}>
+                                    {(Math.round(item.sum * 100) / 100)
+                                        .toString()
+                                        .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            " "
+                                        )}{" "}
+                                    &#8381;
+                                </div>
+                            )}
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+function PaybackTable({ title, data }) {
+    return (
+        <div style={styles.detailedResults}>
+            <h2 style={styles.resultsTitle} key={title}>
+                {title}
+            </h2>
+            <div style={styles.detailedTable}>
+                <div style={styles.tableRow}>
+                    <div style={styles.maintenanceTableCol3}>Показатель</div>
+                    <div style={styles.maintenanceTableCol}>1 год</div>
+                    <div style={styles.maintenanceTableCol}>2 год</div>
+                    <div style={styles.maintenanceTableCol}>3 год</div>
+                    <div style={styles.maintenanceTableCol}>4 год</div>
+                    <div style={styles.maintenanceTableCol}>5 год</div>
+                    <div style={styles.maintenanceTableCol}>6 год</div>
+                    <div style={styles.maintenanceTableCol}>7 год</div>
+                    <div style={styles.maintenanceTableCol}>8 год</div>
+                    <div style={styles.maintenanceTableCol}>ИТОГО</div>
+                </div>
+                {data.map((item, index) => {
+                    return (
+                        <div style={styles.tableRow} key={item.id}>
+                            {index != data.length - 1 ? (
+                                <div style={styles.maintenanceTableCol3}>
+                                    {item.name}
+                                </div>
+                            ) : (
+                                <div style={styles.maintenanceTableCol3}>
+                                    <span>{item.name}</span>
+                                    <span>{floatToYearsMonths(item.sum)}</span>
+                                </div>
+                            )}
+                            {item.years.map((innerItem, innerIndex) => {
+                                return index != data.length - 1 ? (
+                                    <div
+                                        style={styles.maintenanceTableCol}
+                                        key={innerIndex}
+                                    >
+                                        {innerItem !== 0
+                                            ? Math.round(innerItem)
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                ) + " ₽"
+                                            : "-"}
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={styles.maintenanceTableCol}
+                                        key={innerIndex}
+                                    >
+                                        {innerItem !== 0
+                                            ? Math.round(innerItem)
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                )
+                                            : "-"}
+                                    </div>
+                                )
+                            })}
+                            {index != data.length - 1 ? (
+                                <div style={styles.maintenanceTableCol}>
+                                    {item.sum !== 0
+                                        ? Math.round(item.sum)
+                                            .toString()
+                                            .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                " "
+                                            ) + " ₽"
+                                        : "-"}
+                                </div>
+                            ) : (
+                                <div style={styles.maintenanceTableCol}>
+                                    {item.sum !== 0
+                                        ? Math.round(item.sum)
+                                            .toString()
+                                            .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                " "
+                                            )
+                                        : "-"}
+                                </div>
+                            )}
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )
