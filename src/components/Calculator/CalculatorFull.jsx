@@ -2166,21 +2166,21 @@ export default function Calculator() {
                         />
                     ) : null}
 
-                    {/*Таблицы с промежуточными результатами
+                    {//Таблицы с промежуточными результатами
 
-                    <InitialDataTable title='Исходные данные' data={initialData} />
+                        //<InitialDataTable title='Исходные данные' data={initialData} />
 
-                    <TariffTable title="Тарифы" data={tariffData} />
+                        //<TariffTable title="Тарифы" data={tariffData} />
 
-                    <MaintenanceTable title="Техническое обслуживание" data={maintenanceData} />
+                        //<MaintenanceTable title="Техническое обслуживание" data={maintenanceData} />
 
-                    <TepTable title="Расчет технико-экономических показателей до капитального ремонта" data={tepData} />
+                        //<TepTable title="Расчет технико-экономических показателей до капитального ремонта" data={tepData} />
 
-                    <CostPriceTable title="Расчет себестоимости выработанной ГПУ электроэнергии" data={costPriceData} />
+                        <CostPriceTable title="Расчет себестоимости выработанной ГПУ электроэнергии" data={costPriceData} />
 
-                    <PaybackTable title="Расчет простого срока окупаемости" data={paybackData} />
-                    
-                    */}
+                        //<PaybackTable title="Расчет простого срока окупаемости" data={paybackData} />
+
+                    }
                 </div>
             </section>
         </main>
@@ -2692,7 +2692,7 @@ function CostPriceTable({ title, data }) {
             </h2>
             <div style={styles.detailedTable}>
                 <div style={styles.tableRow}>
-                    <div style={styles.maintenanceTableCol3}>Показатель</div>
+                    <div style={styles.maintenanceTableCol3}>Операционные затраты (год)</div>
                     <div style={styles.maintenanceTableCol}>1 год</div>
                     <div style={styles.maintenanceTableCol}>2 год</div>
                     <div style={styles.maintenanceTableCol}>3 год</div>

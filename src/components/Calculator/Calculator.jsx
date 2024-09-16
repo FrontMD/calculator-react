@@ -50,7 +50,10 @@ function useInput(initialValue, type = "") {
                 event.target.style.borderColor = "#005CA9"
             }
         } else if (type === "name") {
-            let currentValue = event.target.value.replace(/[^а-яА-Яa-zA-Z\s]/g, "")
+            let currentValue = event.target.value.replace(
+                /[^а-яА-Яa-zA-Z\s]/g,
+                ""
+            )
             setValue(currentValue)
 
             if (currentValue.length < 2) {
@@ -105,7 +108,6 @@ function useInput(initialValue, type = "") {
     }
 
     function onBlur(event) {
-
         if (type === "name") {
             let currentValue = event.target.value
 
@@ -209,13 +211,14 @@ function useInput(initialValue, type = "") {
 let styles = {
     /* Контейнеры */
     container: {
-        maxWidth: "1170px",
+        width: "100%",
         margin: "0 auto",
         padding: "0 30px",
         boxSizing: "border-box",
     },
     calculator: {
-        padding: "70px 0",
+        maxWidth: "1170px",
+        padding: "0 0 70px",
         boxSizing: "border-box",
         backgroundColor: "white",
     },
@@ -225,49 +228,70 @@ let styles = {
         fontFamily: "Montserrat",
         display: "flex",
         flexDirection: "column",
-        gap: "75px",
-        color: "#000"
-    },
-
-    finalRow: {
-        display: "flex",
-        flexDirection: "column",
         gap: "48px",
+        color: "#000",
     },
 
-    finalRowTitle: {
+    finalTitle: {
         maxWidth: "720px",
         fontSize: "40px",
         fontWeight: "400",
-        lineHeight: "1.1em"
-    },
-
-    finalRowItems: {
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        gap: "25px"
+        lineHeight: "1.1em",
     },
 
     finalTable: {
         display: "flex",
         flexDirection: "column",
-        gap: "24px",
-        padding: "24px",
         fontSize: "16px",
         lineHeight: "1.1em",
         fontWeight: "500",
         backgroundColor: "#F6F6F6",
-        flex: "0 0 560px",
+        flex: "0 0 auto",
         maxWidth: "100%",
         width: "100%",
         boxSizing: "border-box",
+        border: "1px solid #000",
+        borderRightWidth: "0",
+        borderBottomWidth: "0",
+    },
+
+    finalTable2: {
+        display: "flex",
+        flexDirection: "column",
+        fontSize: "12px",
+        lineHeight: "1.1em",
+        fontWeight: "500",
+        backgroundColor: "#F6F6F6",
+        flex: "0 0 auto",
+        maxWidth: "100%",
+        width: "100%",
+        boxSizing: "border-box",
+        border: "1px solid #000",
+        borderRightWidth: "0",
+        borderBottomWidth: "0",
     },
 
     finalTableRow: {
         display: "flex",
         alignItems: "stretch",
         boxSizing: "border-box",
+        borderBottom: "1px solid #000",
+    },
+
+    finalTable2Row: {
+        display: "flex",
+        alignItems: "stretch",
+        boxSizing: "border-box",
+        borderBottom: "1px solid #000",
+    },
+
+    finalTableHeaderRow: {
+        display: "flex",
+        alignItems: "stretch",
+        boxSizing: "border-box",
+        fontWeight: "700",
+        borderBottom: "1px solid #000",
+        textAlign: "center",
     },
 
     finalTableCol1: {
@@ -276,7 +300,9 @@ let styles = {
         justifyContent: "space-between",
         flex: "0 0 70%",
         boxSizing: "border-box",
-        minHeight: "18px"
+        minHeight: "18px",
+        borderRight: "1px solid #000",
+        padding: "8px 0 8px 8px",
     },
 
     finalTableCol2: {
@@ -285,15 +311,139 @@ let styles = {
         justifyContent: "flex-end",
         flex: "1 0 30%",
         boxSizing: "border-box",
-        color: "#005CA9",
         minHeight: "18px",
-        textAlign: "end"
+        textAlign: "end",
+        borderRight: "1px solid #000",
+        padding: "8px 8px 8px 0",
+    },
+
+    finalTableLastCol1: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flex: "0 0 50%",
+        boxSizing: "border-box",
+        minHeight: "18px",
+        borderRight: "1px solid #000",
+        padding: "8px 0 8px 8px",
+    },
+
+    finalTableLastCol2: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        flex: "1 0 50%",
+        boxSizing: "border-box",
+        minHeight: "18px",
+        textAlign: "end",
+        borderRight: "1px solid #000",
+        padding: "8px 8px 8px 0",
+    },
+
+    finalTablePaybackCol2: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flex: "1 0 50%",
+        boxSizing: "border-box",
+        minHeight: "18px",
+        textAlign: "end",
+    },
+
+    finalTablePaybackSubtitle: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flex: "0 1 50%",
+        boxSizing: "border-box",
+        textAlign: "center",
+        minHeight: "18px",
+        borderRight: "1px solid #000",
+        padding: "8px",
+        fontWeight: "700",
+        fontSize: "14px",
+        height: "100%",
+    },
+
+    finalTablePaybackValue: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flex: "0 1 50%",
+        boxSizing: "border-box",
+        minHeight: "18px",
+        textAlign: "end",
+        borderRight: "1px solid #000",
+        padding: "8px",
+        height: "100%",
+    },
+
+    finalTableFirstCol: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flex: "0 0 20%",
+        boxSizing: "border-box",
+        minHeight: "18px",
+        borderRight: "1px solid #000",
+        padding: "8px 0",
+    },
+
+    finalTableFirstNameCol: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        flex: "0 0 20%",
+        boxSizing: "border-box",
+        minHeight: "18px",
+        borderRight: "1px solid #000",
+        padding: "8px",
+    },
+
+    finalTableFirstNameDivCol: {
+        display: "flex",
+        alignItems: "stretch",
+        justifyContent: "flex-start",
+        flex: "0 0 20%",
+        boxSizing: "border-box",
+        minHeight: "18px",
+        borderRight: "1px solid #000",
+    },
+
+    finalTableFirstNameLeft: {
+        flex: "0 1 60%",
+        padding: "8px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        borderRight: "1px solid #000",
+    },
+
+    finalTableFirstNameRight: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        flex: "0 1 40%",
+        padding: "8px",
+    },
+
+    finalTableSecondCol: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: "1",
+        flexGrow: "1",
+        flexBasis: "calc(80% / 9)",
+        boxSizing: "border-box",
+        minHeight: "18px",
+        borderRight: "1px solid #000",
+        padding: "8px 0",
     },
 
     finalTableBlock: {
         display: "flex",
         flexDirection: "column",
-        gap: "24px",
         maxWidth: "100%",
         width: "100%",
         boxSizing: "border-box",
@@ -302,15 +452,17 @@ let styles = {
     finalTableTitleCol: {
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "center",
         flex: "0 0 100%",
         boxSizing: "border-box",
         fontWeight: "700",
+        padding: "8px 0",
+        borderRight: "1px solid #000",
     },
 
     /* диаграммы */
     diagramWrap: {
-        flex: "1 1 100%"
+        flex: "1 1 100%",
     },
 
     /* формы и поля */
@@ -321,7 +473,7 @@ let styles = {
         flexDirection: "column",
         gap: "80px",
         boxSizing: "border-box",
-        userSelect: "none"
+        userSelect: "none",
     },
     formSubtitle1: {
         gridColumn: "1 / 4",
@@ -346,7 +498,7 @@ let styles = {
     formFieldSet: {
         display: "grid",
         gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-        gap: "40px",
+        gap: "28px",
     },
     formFieldSetContacts: {
         maxWidth: "840px",
@@ -358,6 +510,7 @@ let styles = {
         position: "relative",
         display: "flex",
         flexDirection: "column",
+        justifyContent: "space-between",
         gap: "24px",
         boxSizing: "border-box",
         fontFamily: "Montserrat",
@@ -375,6 +528,7 @@ let styles = {
     },
     inputAndSelect: {
         padding: "23px 24px",
+        minHeight: "67px",
         width: "100%",
         outline: "none",
         border: "1px solid #000000",
@@ -387,7 +541,7 @@ let styles = {
         color: "#005CA9",
         backgroundColor: "#fff",
         MozAppearance: "none",
-        WebkitAppearance: "none"
+        WebkitAppearance: "none",
     },
     inputAndSelectError: {
         padding: "23px 24px",
@@ -402,7 +556,7 @@ let styles = {
         fontWeight: "400",
         color: "#005CA9",
         MozAppearance: "none",
-        WebkitAppearance: "none"
+        WebkitAppearance: "none",
     },
     textarea: {
         padding: "16px",
@@ -420,12 +574,12 @@ let styles = {
     inputControls: {
         position: "absolute",
         right: "24px",
-        bottom: "16px"
+        bottom: "16px",
     },
     inputControl: {
         width: "16px",
         height: "16px",
-        cursor: "pointer"
+        cursor: "pointer",
     },
     selectArrow: {
         position: "absolute",
@@ -433,7 +587,7 @@ let styles = {
         bottom: "24px",
         width: "16px",
         height: "16px",
-        pointerEvents: "none"
+        pointerEvents: "none",
     },
     btn: {
         display: "flex",
@@ -447,25 +601,6 @@ let styles = {
         lineHeight: "1.1em",
         color: "white",
         backgroundColor: "#005CA9",
-        outline: "none",
-        border: "none",
-        cursor: "pointer",
-        transition: "background-color 0.2s ease",
-        boxSizing: "border-box",
-    },
-
-    btnHovered: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        padding: "15px 30px",
-        minHeight: "64px",
-        fontFamily: '"Montserrat", sans-serif',
-        fontSize: "20px",
-        lineHeight: "1.1em",
-        color: "white",
-        backgroundColor: "#008ECF",
         outline: "none",
         border: "none",
         cursor: "pointer",
@@ -490,7 +625,7 @@ let styles = {
         left: "0",
         width: "0",
         height: "0",
-        visibility: "hidden"
+        visibility: "hidden",
     },
 
     radioImageItem: {
@@ -499,7 +634,7 @@ let styles = {
         gap: "16px",
         alignItems: "center",
         flex: "1 1 33%",
-        cursor: "pointer"
+        cursor: "pointer",
     },
 
     radioImgBlock: {
@@ -518,7 +653,7 @@ let styles = {
         top: "50%",
         transform: "translate(-50%, -50%)",
         zIndex: "5",
-        opacity: "0"
+        opacity: "0",
     },
 
     radioBgActive: {
@@ -530,7 +665,7 @@ let styles = {
         top: "50%",
         transform: "translate(-50%, -50%)",
         zIndex: "5",
-        opacity: "1"
+        opacity: "1",
     },
 
     radioImage: {
@@ -541,7 +676,7 @@ let styles = {
         left: "50%",
         top: "50%",
         transform: "translate(-50%, -50%)",
-        zIndex: "10"
+        zIndex: "10",
     },
 
     radioName: {
@@ -549,6 +684,7 @@ let styles = {
         lineHeight: "1.1em",
         fontWeight: "400",
         color: "#000",
+        textAlign: "center",
     },
 
     radioNameActive: {
@@ -556,12 +692,13 @@ let styles = {
         lineHeight: "1.1em",
         fontWeight: "400",
         color: "#005CA9",
+        textAlign: "center",
     },
 
     radioBtnItem: {
         flex: "1 1 50%",
         maxWidth: "280px",
-        cursor: "pointer"
+        cursor: "pointer",
     },
 
     radioBtn: {
@@ -575,7 +712,7 @@ let styles = {
         lineHeight: "1.1em",
         fontWeight: "400",
         color: "#005CA9",
-        border: "1px solid #008ECF"
+        border: "1px solid #008ECF",
     },
 
     radioBtnActive: {
@@ -589,13 +726,11 @@ let styles = {
         lineHeight: "1.1em",
         fontWeight: "400",
         color: "#fff",
-        backgroundColor: "#008ECF"
-    }
-
+        backgroundColor: "#008ECF",
+    },
 }
 
 export default function Calculator() {
-
     // Поля ввода
     const exchangeRatesRubCny = useInput(12.58, "float")
     const nominalElectricalPower = useInput(1100)
@@ -620,7 +755,7 @@ export default function Calculator() {
     }
 
     const selectRef = useRef(null)
-    const [btnHover, setBtnHover] = useState(false)
+    //const [btnHover, setBtnHover] = useState(false)
 
     const exchangeRatesRubCnyValue = parseFloat(
         exchangeRatesRubCny.value.toString().replace(/[^\.\d]/g, "")
@@ -771,6 +906,11 @@ export default function Calculator() {
     let calculatorResult = useMemo(() => {
         return getTepData()
     }, [])
+
+    //массив себестоимости
+    const [costPriceData, setCostPriceData] = useState(
+        calculatorResult.resultCostPriceArr
+    )
 
     //Массив итоговой сотимости и технических характеристик
     const [finalCostTechChars, setFinalCostTechChars] = useState(
@@ -1199,6 +1339,7 @@ export default function Calculator() {
                     data: [Math.round(capex)],
                 },
             ],
+
         }
 
         // цикл по годам
@@ -1419,6 +1560,7 @@ export default function Calculator() {
             )
         }
 
+
         //Помещаем итоги ТЭП в массив ТЭП
         resultTepArr.forEach((item, index) => {
             item.sum = sumsTepArr[Object.keys(sumsTepArr)[index]]
@@ -1471,7 +1613,7 @@ export default function Calculator() {
                     },
                     {
                         id: "consumptionElectricalEnergy",
-                        name: "потребление электрической энергии на собственные нужды энергоцентра, кВт*ч/год",
+                        name: "собственные нужды энергоцентра, кВт*ч/год",
                         value:
                             resultTepArr[2].years[0] - resultTepArr[3].years[0],
                     },
@@ -1488,7 +1630,7 @@ export default function Calculator() {
                 data: [
                     {
                         id: "generationThermalEnergy",
-                        name: "выработка тепловой энергии генераторами, Гкал/год",
+                        name: "производимое количество тепловой энергии, Гкал/год",
                         value: resultTepArr[4].years[0],
                     },
                 ],
@@ -1499,7 +1641,7 @@ export default function Calculator() {
                 data: [
                     {
                         id: "consumptionGas",
-                        name: "потребление природного газа генераторами, Нм3/год",
+                        name: "годовое потребление газа Энергоцентра, Нм3/год",
                         value: resultTepArr[5].years[0],
                     },
                 ],
@@ -1509,9 +1651,20 @@ export default function Calculator() {
                 name: "Окупаемость",
                 data: [
                     {
+                        id: "paybackHeader",
+                        name: "",
+                        value1: "При производстве собственной энергии",
+                        value2: "Приобретение эквивалентного количества энергоресурсов от сетей"
+                    },
+                    {
                         id: "averageElectricalEnergyСosts",
-                        name: "Средние затраты за расчетный период на приобретение электрической энергии в год у сбытовой компании, руб. без НДС",
-                        value:
+                        name: "Средние затраты на ЭЭ в год, руб. без НДС",
+                        value1:
+                            Math.round(
+                                resultCostPriceArr[0].sum /
+                                resultPaybackArr[0].years.length
+                            ) + " ₽",
+                        value2:
                             Math.round(
                                 resultPaybackArr[0].sum /
                                 resultPaybackArr[0].years.length
@@ -1519,17 +1672,23 @@ export default function Calculator() {
                     },
                     {
                         id: "averageThermalEnergyСosts",
-                        name: "Средние затраты за расчетный период на приобретение тепловой энергии в год у сбытовой компании, руб. без НДС",
-                        value:
+                        name: "Средние затраты на приобретение тепловой энергии в год, руб. без НДС",
+                        value1: "",
+                        value2:
                             Math.round(
                                 resultPaybackArr[1].sum /
                                 resultPaybackArr[1].years.length
                             ) + " ₽",
                     },
                     {
-                        id: "totalEnergyCosts",
-                        name: "Итого затраты на приобретение энергоносителей, руб. без НДС",
-                        value:
+                        id: "averageEnergyProductionCosts",
+                        name: "Итого затраты на электро- и тепло- энергию, руб. без НДС",
+                        value1:
+                            Math.round(
+                                resultCostPriceArr[0].sum /
+                                resultPaybackArr[0].years.length
+                            ) + " ₽",
+                        value2:
                             Math.round(
                                 resultPaybackArr[0].sum /
                                 resultPaybackArr[0].years.length +
@@ -1538,27 +1697,20 @@ export default function Calculator() {
                             ) + " ₽",
                     },
                     {
-                        id: "averageEnergyProductionCosts",
-                        name: "Средние затраты за расчетный период на производство электрической и тепловой энергии на собственном энергоцентре, руб. без НДС",
-                        value:
-                            Math.round(
-                                resultCostPriceArr[0].sum /
-                                resultPaybackArr[0].years.length
-                            ) + " ₽",
-                    },
-                    {
                         id: "averageSavings",
-                        name: "Средняя за расчетный период ежегодная экономия, руб. без НДС",
-                        value:
+                        name: "Экономия за год, руб. без НДС",
+                        value1:
                             Math.round(
                                 resultPaybackArr[5].sum /
                                 resultPaybackArr[5].years.length
                             ) + " ₽",
+                        value2: "",
                     },
                     {
                         id: "paybackPeriod",
                         name: "Срок окупаемости, лет",
-                        value: floatToYearsMonths(resultPaybackArr[7].sum),
+                        value1: floatToYearsMonths(resultPaybackArr[7].sum),
+                        value2: "",
                     },
                 ],
             },
@@ -1626,7 +1778,9 @@ export default function Calculator() {
                             style={styles.calculatorForm}
                         >
                             <div style={styles.formFieldSet}>
-                                <p style={styles.formSubtitle1}>Укажите данные для просчета</p>
+                                <p style={styles.formSubtitle1}>
+                                    Укажите данные для просчета
+                                </p>
                                 <div style={styles.formField}>
                                     <label htmlFor="exchangeRatesRubCny">
                                         Курс рубля к ЮАНЬ
@@ -1646,21 +1800,68 @@ export default function Calculator() {
                                     />
 
                                     <div style={styles.inputControls}>
-                                        <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "up", exchangeRatesRubCny, "fraction")} >
-                                            <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                        <div
+                                            style={styles.inputControl}
+                                            onClick={(e) =>
+                                                inputControlHandler(
+                                                    e,
+                                                    "up",
+                                                    exchangeRatesRubCny,
+                                                    "fraction"
+                                                )
+                                            }
+                                        >
+                                            <svg
+                                                width="100%"
+                                                height="100%"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                    fill="black"
+                                                />
                                             </svg>
                                         </div>
-                                        <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "down", exchangeRatesRubCny, "fraction")} >
-                                            <svg style={{ transform: "rotate(180deg)" }} width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                        <div
+                                            style={styles.inputControl}
+                                            onClick={(e) =>
+                                                inputControlHandler(
+                                                    e,
+                                                    "down",
+                                                    exchangeRatesRubCny,
+                                                    "fraction"
+                                                )
+                                            }
+                                        >
+                                            <svg
+                                                style={{
+                                                    transform: "rotate(180deg)",
+                                                }}
+                                                width="100%"
+                                                height="100%"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                    fill="black"
+                                                />
                                             </svg>
                                         </div>
                                     </div>
-
                                 </div>
 
-                                <div className="selectWrap" style={styles.formField}>
+                                <div
+                                    className="selectWrap"
+                                    style={styles.formField}
+                                >
                                     <label htmlFor="nominalElectricalPower">
                                         Номин. эл. мощность ГПУ
                                     </label>
@@ -1669,7 +1870,9 @@ export default function Calculator() {
                                         name=""
                                         id="nominalElectricalPower"
                                         value={nominalElectricalPower.value}
-                                        onChange={nominalElectricalPower.onChange}
+                                        onChange={
+                                            nominalElectricalPower.onChange
+                                        }
                                         onFocus={nominalElectricalPower.onFocus}
                                         onBlur={nominalElectricalPower.onBlur}
                                         style={styles.inputAndSelect}
@@ -1679,12 +1882,25 @@ export default function Calculator() {
                                         <option value="2000">2000 кВт</option>
                                     </select>
 
-                                    <div style={styles.selectArrow} >
-                                        <svg style={{ transform: "rotate(180deg)" }} width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                    <div style={styles.selectArrow}>
+                                        <svg
+                                            style={{
+                                                transform: "rotate(180deg)",
+                                            }}
+                                            width="100%"
+                                            height="100%"
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                clipRule="evenodd"
+                                                d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                fill="black"
+                                            />
                                         </svg>
                                     </div>
-
                                 </div>
 
                                 <div style={styles.formField}>
@@ -1705,14 +1921,59 @@ export default function Calculator() {
                                         }
                                     />
                                     <div style={styles.inputControls}>
-                                        <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "up", amount, "number")} >
-                                            <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                        <div
+                                            style={styles.inputControl}
+                                            onClick={(e) =>
+                                                inputControlHandler(
+                                                    e,
+                                                    "up",
+                                                    amount,
+                                                    "number"
+                                                )
+                                            }
+                                        >
+                                            <svg
+                                                width="100%"
+                                                height="100%"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                    fill="black"
+                                                />
                                             </svg>
                                         </div>
-                                        <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "down", amount, "number")} >
-                                            <svg style={{ transform: "rotate(180deg)" }} width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                        <div
+                                            style={styles.inputControl}
+                                            onClick={(e) =>
+                                                inputControlHandler(
+                                                    e,
+                                                    "down",
+                                                    amount,
+                                                    "number"
+                                                )
+                                            }
+                                        >
+                                            <svg
+                                                style={{
+                                                    transform: "rotate(180deg)",
+                                                }}
+                                                width="100%"
+                                                height="100%"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                    fill="black"
+                                                />
                                             </svg>
                                         </div>
                                     </div>
@@ -1720,7 +1981,9 @@ export default function Calculator() {
                             </div>
 
                             <div style={styles.formField}>
-                                <p style={{ padding: "0", margin: "0" }}>Выберите исполнение</p>
+                                <p style={{ padding: "0", margin: "0" }}>
+                                    Выберите исполнение
+                                </p>
                                 <div style={styles.radioList}>
                                     <label style={styles.radioImageItem}>
                                         <input
@@ -1728,19 +1991,47 @@ export default function Calculator() {
                                             type="radio"
                                             name="execution"
                                             value="open"
-                                            checked={execution == "open" ? true : false}
-                                            onChange={executionChangeHandler} />
+                                            checked={
+                                                execution == "open"
+                                                    ? true
+                                                    : false
+                                            }
+                                            onChange={executionChangeHandler}
+                                        />
                                         <span style={styles.radioImgBlock}>
-                                            <span style={execution == "open" ? styles.radioBgActive : styles.radioBg}>
-                                                <svg width="100%" height="100%" viewBox="0 0 135 152" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M67.5126 0C45.0168 13.3147 22.5084 26.6294 0 39.9314V110.273C22.5084 123.916 45.0168 137.572 67.5126 151.216C90.0084 137.572 112.504 123.916 135 110.273V39.9314C112.504 26.6294 90.0084 13.3147 67.5126 0Z" fill="#005CA9" />
+                                            <span
+                                                style={
+                                                    execution == "open"
+                                                        ? styles.radioBgActive
+                                                        : styles.radioBg
+                                                }
+                                            >
+                                                <svg
+                                                    width="100%"
+                                                    height="100%"
+                                                    viewBox="0 0 135 152"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M67.5126 0C45.0168 13.3147 22.5084 26.6294 0 39.9314V110.273C22.5084 123.916 45.0168 137.572 67.5126 151.216C90.0084 137.572 112.504 123.916 135 110.273V39.9314C112.504 26.6294 90.0084 13.3147 67.5126 0Z"
+                                                        fill="#005CA9"
+                                                    />
                                                 </svg>
                                             </span>
                                             <span style={styles.radioImage}>
-                                                <img src="https://framerusercontent.com/images/LQP9uepLhgc063NqO0ApCqxcKU.svg" />
+                                                <img src="https://framerusercontent.com/images/6RUdVIMGApPqdxoyAhQHpQ0bYA.png" />
                                             </span>
                                         </span>
-                                        <span style={execution == "open" ? styles.radioNameActive : styles.radioName}>Открытое</span>
+                                        <span
+                                            style={
+                                                execution == "open"
+                                                    ? styles.radioNameActive
+                                                    : styles.radioName
+                                            }
+                                        >
+                                            Открытое
+                                        </span>
                                     </label>
                                     <label style={styles.radioImageItem}>
                                         <input
@@ -1748,19 +2039,47 @@ export default function Calculator() {
                                             type="radio"
                                             name="execution"
                                             value="container"
-                                            checked={execution == "container" ? true : false}
-                                            onChange={executionChangeHandler} />
+                                            checked={
+                                                execution == "container"
+                                                    ? true
+                                                    : false
+                                            }
+                                            onChange={executionChangeHandler}
+                                        />
                                         <span style={styles.radioImgBlock}>
-                                            <span style={execution == "container" ? styles.radioBgActive : styles.radioBg}>
-                                                <svg width="100%" height="100%" viewBox="0 0 135 152" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M67.5126 0C45.0168 13.3147 22.5084 26.6294 0 39.9314V110.273C22.5084 123.916 45.0168 137.572 67.5126 151.216C90.0084 137.572 112.504 123.916 135 110.273V39.9314C112.504 26.6294 90.0084 13.3147 67.5126 0Z" fill="#005CA9" />
+                                            <span
+                                                style={
+                                                    execution == "container"
+                                                        ? styles.radioBgActive
+                                                        : styles.radioBg
+                                                }
+                                            >
+                                                <svg
+                                                    width="100%"
+                                                    height="100%"
+                                                    viewBox="0 0 135 152"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M67.5126 0C45.0168 13.3147 22.5084 26.6294 0 39.9314V110.273C22.5084 123.916 45.0168 137.572 67.5126 151.216C90.0084 137.572 112.504 123.916 135 110.273V39.9314C112.504 26.6294 90.0084 13.3147 67.5126 0Z"
+                                                        fill="#005CA9"
+                                                    />
                                                 </svg>
                                             </span>
                                             <span style={styles.radioImage}>
-                                                <img src="https://framerusercontent.com/images/kkOViUf5A7Mz4BkgKsd823Yk0.svg" />
+                                                <img src="https://framerusercontent.com/images/z6IrKT2OztyUAUVHo86NwlKJgPQ.png" />
                                             </span>
                                         </span>
-                                        <span style={execution == "container" ? styles.radioNameActive : styles.radioName}>Контейнерное без утилизации тепла</span>
+                                        <span
+                                            style={
+                                                execution == "container"
+                                                    ? styles.radioNameActive
+                                                    : styles.radioName
+                                            }
+                                        >
+                                            Контейнерное без утилизации тепла
+                                        </span>
                                     </label>
                                     <label style={styles.radioImageItem}>
                                         <input
@@ -1768,51 +2087,118 @@ export default function Calculator() {
                                             type="radio"
                                             name="execution"
                                             value="containerHeatRecovery"
-                                            checked={execution == "containerHeatRecovery" ? true : false}
-                                            onChange={executionChangeHandler} />
+                                            checked={
+                                                execution ==
+                                                    "containerHeatRecovery"
+                                                    ? true
+                                                    : false
+                                            }
+                                            onChange={executionChangeHandler}
+                                        />
                                         <span style={styles.radioImgBlock}>
-                                            <span style={execution == "containerHeatRecovery" ? styles.radioBgActive : styles.radioBg}>
-                                                <svg width="100%" height="100%" viewBox="0 0 135 152" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M67.5126 0C45.0168 13.3147 22.5084 26.6294 0 39.9314V110.273C22.5084 123.916 45.0168 137.572 67.5126 151.216C90.0084 137.572 112.504 123.916 135 110.273V39.9314C112.504 26.6294 90.0084 13.3147 67.5126 0Z" fill="#005CA9" />
+                                            <span
+                                                style={
+                                                    execution ==
+                                                        "containerHeatRecovery"
+                                                        ? styles.radioBgActive
+                                                        : styles.radioBg
+                                                }
+                                            >
+                                                <svg
+                                                    width="100%"
+                                                    height="100%"
+                                                    viewBox="0 0 135 152"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M67.5126 0C45.0168 13.3147 22.5084 26.6294 0 39.9314V110.273C22.5084 123.916 45.0168 137.572 67.5126 151.216C90.0084 137.572 112.504 123.916 135 110.273V39.9314C112.504 26.6294 90.0084 13.3147 67.5126 0Z"
+                                                        fill="#005CA9"
+                                                    />
                                                 </svg>
                                             </span>
                                             <span style={styles.radioImage}>
-                                                <img src="https://framerusercontent.com/images/5QNAGym1HwepCYPXSHsWuT12FS4.svg" />
+                                                <img src="https://framerusercontent.com/images/ONUjdy9kIidrgP2yx2lx1GMygQ.png" />
                                             </span>
                                         </span>
-                                        <span style={execution == "containerHeatRecovery" ? styles.radioNameActive : styles.radioName}>Контейнерное с утилизацией тепла</span>
+                                        <span
+                                            style={
+                                                execution ==
+                                                    "containerHeatRecovery"
+                                                    ? styles.radioNameActive
+                                                    : styles.radioName
+                                            }
+                                        >
+                                            Контейнерное с утилизацией тепла
+                                        </span>
                                     </label>
                                 </div>
                             </div>
 
-                            {execution ===
-                                "containerHeatRecovery" && (
-                                    <div style={styles.formField}>
-                                        <p style={{ padding: "0", margin: "0" }}>Выберите период использование тепловой энергии ГПУ</p>
-                                        <div style={styles.radioListBtns}>
-                                            <label style={styles.radioBtnItem}>
-                                                <input
-                                                    style={styles.hideRadioInput}
-                                                    type="radio"
-                                                    name="useThermalEnergy"
-                                                    value="allEYear"
-                                                    checked={execution == "allEYear" ? true : false}
-                                                    onChange={useThermalEnergyChangeHandler} />
-                                                <span style={useThermalEnergy == "allEYear" ? styles.radioBtnActive : styles.radioBtn}>Круглый год</span>
-                                            </label>
-                                            <label style={styles.radioBtnItem}>
-                                                <input
-                                                    style={styles.hideRadioInput}
-                                                    type="radio"
-                                                    name="useThermalEnergy"
-                                                    value="heatingSeason"
-                                                    checked={execution == "heatingSeason" ? true : false}
-                                                    onChange={useThermalEnergyChangeHandler} />
-                                                <span style={useThermalEnergy == "heatingSeason" ? styles.radioBtnActive : styles.radioBtn}>Отопительный сезон</span>
-                                            </label>
-                                        </div>
+                            {execution === "containerHeatRecovery" && (
+                                <div style={styles.formField}>
+                                    <p style={{ padding: "0", margin: "0" }}>
+                                        Выберите период использование тепловой
+                                        энергии ГПУ
+                                    </p>
+                                    <div style={styles.radioListBtns}>
+                                        <label style={styles.radioBtnItem}>
+                                            <input
+                                                style={styles.hideRadioInput}
+                                                type="radio"
+                                                name="useThermalEnergy"
+                                                value="allEYear"
+                                                checked={
+                                                    useThermalEnergy ==
+                                                        "allEYear"
+                                                        ? true
+                                                        : false
+                                                }
+                                                onChange={
+                                                    useThermalEnergyChangeHandler
+                                                }
+                                            />
+                                            <span
+                                                style={
+                                                    useThermalEnergy ==
+                                                        "allEYear"
+                                                        ? styles.radioBtnActive
+                                                        : styles.radioBtn
+                                                }
+                                            >
+                                                Круглый год
+                                            </span>
+                                        </label>
+                                        <label style={styles.radioBtnItem}>
+                                            <input
+                                                style={styles.hideRadioInput}
+                                                type="radio"
+                                                name="useThermalEnergy"
+                                                value="heatingSeason"
+                                                checked={
+                                                    useThermalEnergy ==
+                                                        "heatingSeason"
+                                                        ? true
+                                                        : false
+                                                }
+                                                onChange={
+                                                    useThermalEnergyChangeHandler
+                                                }
+                                            />
+                                            <span
+                                                style={
+                                                    useThermalEnergy ==
+                                                        "heatingSeason"
+                                                        ? styles.radioBtnActive
+                                                        : styles.radioBtn
+                                                }
+                                            >
+                                                Отопительный сезон
+                                            </span>
+                                        </label>
                                     </div>
-                                )}
+                                </div>
+                            )}
 
                             <div style={styles.formFieldSet}>
                                 <div style={styles.formField}>
@@ -1833,14 +2219,59 @@ export default function Calculator() {
                                         }
                                     />
                                     <div style={styles.inputControls}>
-                                        <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "up", gasPrice, "number")} >
-                                            <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                        <div
+                                            style={styles.inputControl}
+                                            onClick={(e) =>
+                                                inputControlHandler(
+                                                    e,
+                                                    "up",
+                                                    gasPrice,
+                                                    "number"
+                                                )
+                                            }
+                                        >
+                                            <svg
+                                                width="100%"
+                                                height="100%"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                    fill="black"
+                                                />
                                             </svg>
                                         </div>
-                                        <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "down", gasPrice, "number")} >
-                                            <svg style={{ transform: "rotate(180deg)" }} width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                        <div
+                                            style={styles.inputControl}
+                                            onClick={(e) =>
+                                                inputControlHandler(
+                                                    e,
+                                                    "down",
+                                                    gasPrice,
+                                                    "number"
+                                                )
+                                            }
+                                        >
+                                            <svg
+                                                style={{
+                                                    transform: "rotate(180deg)",
+                                                }}
+                                                width="100%"
+                                                height="100%"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                    fill="black"
+                                                />
                                             </svg>
                                         </div>
                                     </div>
@@ -1864,62 +2295,152 @@ export default function Calculator() {
                                         }
                                     />
                                     <div style={styles.inputControls}>
-                                        <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "up", priceElectricity, "number")} >
-                                            <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                        <div
+                                            style={styles.inputControl}
+                                            onClick={(e) =>
+                                                inputControlHandler(
+                                                    e,
+                                                    "up",
+                                                    priceElectricity,
+                                                    "number"
+                                                )
+                                            }
+                                        >
+                                            <svg
+                                                width="100%"
+                                                height="100%"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                    fill="black"
+                                                />
                                             </svg>
                                         </div>
-                                        <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "down", priceElectricity, "number")} >
-                                            <svg style={{ transform: "rotate(180deg)" }} width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
+                                        <div
+                                            style={styles.inputControl}
+                                            onClick={(e) =>
+                                                inputControlHandler(
+                                                    e,
+                                                    "down",
+                                                    priceElectricity,
+                                                    "number"
+                                                )
+                                            }
+                                        >
+                                            <svg
+                                                style={{
+                                                    transform: "rotate(180deg)",
+                                                }}
+                                                width="100%"
+                                                height="100%"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                    fill="black"
+                                                />
                                             </svg>
                                         </div>
                                     </div>
                                 </div>
 
-                                {execution ===
-                                    "containerHeatRecovery" && (
-                                        <div style={styles.formField}>
-                                            <label htmlFor="priceThermalEnergy">
-                                                Стоимость 1 Гкал т/э, руб. без НДС
-                                            </label>
-                                            <input
-                                                type="input"
-                                                id="priceThermalEnergy"
-                                                value={priceThermalEnergy.value}
-                                                onChange={
-                                                    priceThermalEnergy.onChange
+                                {execution === "containerHeatRecovery" && (
+                                    <div style={styles.formField}>
+                                        <label htmlFor="priceThermalEnergy">
+                                            Стоимость 1 Гкал т/э, руб. без НДС
+                                        </label>
+                                        <input
+                                            type="input"
+                                            id="priceThermalEnergy"
+                                            value={priceThermalEnergy.value}
+                                            onChange={
+                                                priceThermalEnergy.onChange
+                                            }
+                                            onFocus={priceThermalEnergy.onFocus}
+                                            onBlur={priceThermalEnergy.onBlur}
+                                            style={
+                                                !priceThermalEnergy.error
+                                                    ? styles.inputAndSelect
+                                                    : styles.inputAndSelectError
+                                            }
+                                        />
+                                        <div style={styles.inputControls}>
+                                            <div
+                                                style={styles.inputControl}
+                                                onClick={(e) =>
+                                                    inputControlHandler(
+                                                        e,
+                                                        "up",
+                                                        priceThermalEnergy,
+                                                        "number"
+                                                    )
                                                 }
-                                                onFocus={priceThermalEnergy.onFocus}
-                                                onBlur={priceThermalEnergy.onBlur}
-                                                style={
-                                                    !priceThermalEnergy.error
-                                                        ? styles.inputAndSelect
-                                                        : styles.inputAndSelectError
+                                            >
+                                                <svg
+                                                    width="100%"
+                                                    height="100%"
+                                                    viewBox="0 0 16 16"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                        fill="black"
+                                                    />
+                                                </svg>
+                                            </div>
+                                            <div
+                                                style={styles.inputControl}
+                                                onClick={(e) =>
+                                                    inputControlHandler(
+                                                        e,
+                                                        "down",
+                                                        priceThermalEnergy,
+                                                        "number"
+                                                    )
                                                 }
-                                            />
-                                            <div style={styles.inputControls}>
-                                                <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "up", priceThermalEnergy, "number")} >
-                                                    <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
-                                                    </svg>
-                                                </div>
-                                                <div style={styles.inputControl} onClick={(e) => inputControlHandler(e, "down", priceThermalEnergy, "number")} >
-                                                    <svg style={{ transform: "rotate(180deg)" }} width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path fillRule="evenodd" clipRule="evenodd" d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z" fill="black" />
-                                                    </svg>
-                                                </div>
+                                            >
+                                                <svg
+                                                    style={{
+                                                        transform:
+                                                            "rotate(180deg)",
+                                                    }}
+                                                    width="100%"
+                                                    height="100%"
+                                                    viewBox="0 0 16 16"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        clipRule="evenodd"
+                                                        d="M14.0104 9.98959L8 3.97918L1.98959 9.98959L2.6967 10.6967L8 5.3934L13.3033 10.6967L14.0104 9.98959Z"
+                                                        fill="black"
+                                                    />
+                                                </svg>
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
+                                )}
                             </div>
 
                             <div style={styles.formFieldSetContacts}>
-                                <p style={styles.formSubtitle2}>Ваши контактные данные</p>
+                                <p style={styles.formSubtitle2}>
+                                    Ваши контактные данные
+                                </p>
                                 <div style={styles.formField}>
-                                    <label htmlFor="userName">
-                                        Ваше имя
-                                    </label>
+                                    <label htmlFor="userName">Ваше имя</label>
                                     <input
                                         type="input"
                                         id="userName"
@@ -1955,7 +2476,9 @@ export default function Calculator() {
                                 </div>
 
                                 <div style={styles.formField}>
-                                    <label htmlFor="userPhone">Ваш номер телефона</label>
+                                    <label htmlFor="userPhone">
+                                        Ваш номер телефона
+                                    </label>
                                     <input
                                         type="input"
                                         id="userPhone"
@@ -1973,9 +2496,7 @@ export default function Calculator() {
                                 </div>
 
                                 <div style={styles.formField}>
-                                    <label htmlFor="userEmail">
-                                        Ваш email
-                                    </label>
+                                    <label htmlFor="userEmail">Ваш email</label>
                                     <input
                                         type="input"
                                         id="userEmail"
@@ -2004,21 +2525,19 @@ export default function Calculator() {
                                         onBlur={userComment.onBlur}
                                         placeholder="Ваш комментарий"
                                         rows="4"
-                                        style={
-                                            styles.textarea
-                                        }
+                                        style={styles.textarea}
                                     />
                                 </div>
 
                                 <Button
                                     type="submit"
-                                    onMouseEnter={() => setBtnHover(true)}
-                                    onMouseLeave={() => setBtnHover(false)}
-                                    style={
-                                        btnHover ?
-                                            styles.btnHovered :
-                                            styles.btn
-                                    }
+                                    onMouseEnter={(e) => {
+                                        e.target.style.backgroundColor = "#008ECF"
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.backgroundColor = "#005CA9"
+                                    }}
+                                    style={styles.btn}
                                 >
                                     Рассчитать стоимость
                                 </Button>
@@ -2074,6 +2593,7 @@ export default function Calculator() {
         setCalculateFormVisibility(false)
         window.scrollTo(0, 0)
         calculatorResult = getTepData()
+        setCostPriceData(calculatorResult.resultCostPriceArr)
         setFinalCostTechChars(calculatorResult.finalCostTechCharsArr)
         setFinalAnnualIndicators(calculatorResult.finalAnnualIndicatorsArr)
         setEnergyProductionСostsDiagram(
@@ -2082,7 +2602,13 @@ export default function Calculator() {
         setEnergyСostsDiagram(calculatorResult.energyСostsDiagramObj)
 
         submitForm(
-            [userName.value, companyName.value, userPhone.value, userEmail.value, userComment.value],
+            [
+                userName.value,
+                companyName.value,
+                userPhone.value,
+                userEmail.value,
+                userComment.value,
+            ],
             calculatorResult.finalCostTechCharsArr,
             calculatorResult.finalAnnualIndicatorsArr
         )
@@ -2092,113 +2618,226 @@ export default function Calculator() {
         e.preventDefault()
         e.stopPropagation()
 
-        let startValue = isNaN(parseFloat(targetState.value)) ? 0 : parseFloat(targetState.value)
+        let startValue = isNaN(parseFloat(targetState.value))
+            ? 0
+            : parseFloat(targetState.value)
         let step = 1
 
         switch (type) {
             case "fraction":
                 step = 0.01
                 if (dir == "up") {
-                    targetState.setValue(Math.round((startValue + step) * 100) / 100)
+                    targetState.setValue(
+                        Math.round((startValue + step) * 100) / 100
+                    )
                 } else if (dir == "down") {
-                    targetState.setValue(startValue - step > 0 ? Math.round((startValue - step) * 100) / 100 : 0.01)
+                    targetState.setValue(
+                        startValue - step > 0
+                            ? Math.round((startValue - step) * 100) / 100
+                            : 0.01
+                    )
                 }
 
-                break;
+                break
             case "number":
                 if (dir == "up") {
                     targetState.setValue(startValue + step)
                 } else if (dir == "down") {
-                    targetState.setValue(startValue - step > 0 ? startValue - step : 1)
+                    targetState.setValue(
+                        startValue - step > 0 ? startValue - step : 1
+                    )
                 }
-                break;
+                break
             default:
                 return
         }
 
         targetState.setError(false)
-
     }
-}
+    // Компоненты
+    function Button({ children, type, ...props }) {
+        return (
+            <button type={type} {...props}>
+                {children}
+            </button>
+        )
+    }
 
-// Компоненты
-function Button({ children, type, ...props }) {
-    return (
-        <button type={type} {...props}>
-            {children}
-        </button>
-    )
-}
+    function CostPriceTable({ data }) {
 
-function FinalData({
-    costTechChars,
-    annualIndicators,
-    energyProductionСostsDiagram,
-    energyСostsDiagram,
-}) {
-    return (
-        <div style={styles.finalContainer}>
-            <div style={styles.finalRow}>
-                <div style={styles.finalRowTitle}>
-                    Стоимость и основные технические характеристики
+        return (
+            <div style={styles.finalTable2}>
+                <div style={styles.finalTableHeaderRow}>
+                    <div style={styles.finalTableFirstCol}>Операционные затраты (год)</div>
+                    <div style={styles.finalTableSecondCol}>1 год</div>
+                    <div style={styles.finalTableSecondCol}>2 год</div>
+                    <div style={styles.finalTableSecondCol}>3 год</div>
+                    <div style={styles.finalTableSecondCol}>4 год</div>
+                    <div style={styles.finalTableSecondCol}>5 год</div>
+                    <div style={styles.finalTableSecondCol}>6 год</div>
+                    <div style={styles.finalTableSecondCol}>7 год</div>
+                    <div style={styles.finalTableSecondCol}>8 год</div>
+                    <div style={styles.finalTableSecondCol}>ИТОГО</div>
                 </div>
-                <div style={styles.finalRowItems}>
-                    <div style={styles.finalTable}>
-                        {costTechChars.map((item, index) => {
-                            return (
-                                <div style={styles.finalTableRow} key={item.id}>
-                                    <div style={styles.finalTableCol1}>
+                {data.map((item, index) => {
+                    return (
+                        <div style={index == data.length - 1 ? styles.finalTableRow : styles.finalTable2Row} key={item.id}>
+                            {index == 4 ? (
+                                <div style={styles.finalTableFirstNameDivCol}>
+                                    <span style={styles.finalTableFirstNameLeft}>
                                         {item.name}
-                                    </div>
-                                    <div style={styles.finalTableCol2}>
-                                        <span>
-                                            {index !== 0
-                                                ? item.value
-                                                    .toString()
-                                                    .replace(
-                                                        /\B(?=(\d{3})+(?!\d))/g,
-                                                        " "
-                                                    )
-                                                : item.value}
-                                        </span>
-                                    </div>
+                                    </span>
+                                    <span style={styles.finalTableFirstNameRight}>
+                                        {(Math.round(item.sum * 100) / 100)
+                                            .toString()
+                                            .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                " "
+                                            )}{" "}
+                                        &#8381;
+                                    </span>
+                                </div>
+                            ) : (
+                                <div style={styles.finalTableFirstNameCol}>
+                                    {item.name}
                                 </div>
                             )
-                        })}
-                    </div>
-                    <div style={styles.diagramWrap}>
-                        <Bar
-                            data={energyProductionСostsDiagram}
-                            options={{
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        font: {
-                                            size: 20,
-                                        },
-                                        text: "Затраты на выработку э/э",
-                                    },
-                                },
-                                scales: {
-                                    x: {
-                                        stacked: true,
-                                    },
-                                    y: {
-                                        stacked: true,
-                                    },
-                                },
-                            }}
-                        />
-                    </div>
+
+                            }
+                            {
+                                item.years.map((innerItem, innerIndex) => {
+                                    return index < 4 ? (
+                                        <div
+                                            style={styles.finalTableSecondCol}
+                                            key={innerIndex}
+                                        >
+                                            {Math.round(innerItem)
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                )}{" "}
+                                            &#8381;
+                                        </div>
+                                    ) : (
+                                        <div
+                                            style={styles.finalTableSecondCol}
+                                            key={innerIndex}
+                                        >
+                                            {(Math.round(innerItem * 100) / 100)
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                )}{" "}
+                                            &#8381;
+                                        </div>
+                                    )
+                                })
+                            }
+                            {
+                                index < 4 ? (
+                                    <div style={styles.finalTableSecondCol} >
+                                        {
+                                            Math.round(item.sum)
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                )
+                                        }{" "}
+                                        &#8381;
+                                    </div>
+                                ) : (
+                                    <div style={styles.finalTableSecondCol}>
+                                        {(Math.round(item.sum * 100) / 100)
+                                            .toString()
+                                            .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                " "
+                                            )}{" "}
+                                        &#8381;
+                                    </div>
+                                )
+                            }
+                        </div >
+                    )
+                })}
+            </div >
+        )
+    }
+
+    function FinalData({
+        costTechChars,
+        annualIndicators,
+        energyProductionСostsDiagram,
+        energyСostsDiagram,
+    }) {
+        return (
+            <div style={styles.finalContainer}>
+
+                <div style={styles.finalTitle}>
+                    Стоимость и основные технические характеристики
                 </div>
-            </div>
-            <div style={styles.finalRow}>
-                <div style={styles.finalRowTitle}>
-                    Расчетные годовые показатели при годовой наработке 8000 рабочих часов
+
+                <div style={styles.finalTable}>
+                    {costTechChars.map((item, index) => {
+                        return (
+                            <div style={styles.finalTableRow} key={item.id}>
+                                <div style={styles.finalTableCol1}>
+                                    {item.name}
+                                </div>
+                                <div style={styles.finalTableCol2}>
+                                    <span>
+                                        {index !== 0
+                                            ? item.value
+                                                .toString()
+                                                .replace(
+                                                    /\B(?=(\d{3})+(?!\d))/g,
+                                                    " "
+                                                )
+                                            : item.value}
+                                    </span>
+                                </div>
+                            </div>
+                        )
+                    })}
                 </div>
-                <div style={styles.finalRowItems}>
-                    <div style={styles.finalTable}>
-                        {annualIndicators.map((item) => {
+                <CostPriceTable data={costPriceData} />
+                <div style={styles.diagramWrap}>
+                    <Bar
+                        data={energyProductionСostsDiagram}
+                        options={{
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    font: {
+                                        size: 20,
+                                    },
+                                    text: "Затраты на выработку э/э",
+                                },
+                            },
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                },
+                                y: {
+                                    stacked: true,
+                                },
+                            },
+                        }}
+                    />
+                </div>
+
+
+                <div style={styles.finalTitle}>
+                    Расчетные годовые показатели при годовой наработке 8000
+                    рабочих часов
+                </div>
+
+                <div style={styles.finalTable}>
+                    {annualIndicators.map((item) => {
+                        if (item.id !== "Payback") {
                             return (
                                 <div
                                     style={styles.finalTableBlock}
@@ -2220,68 +2859,133 @@ function FinalData({
                                             >
                                                 <div
                                                     style={
-                                                        styles.finalTableCol1
+                                                        styles.finalTableLastCol1
                                                     }
                                                 >
                                                     {dataItem.name}
                                                 </div>
                                                 <div
                                                     style={
-                                                        styles.finalTableCol2
+                                                        styles.finalTableLastCol2
                                                     }
                                                 >
-                                                    {item.id !== "Payback" ? (
-                                                        <span>
-                                                            {dataItem.value !==
-                                                                0
-                                                                ? Math.round(
-                                                                    dataItem.value
-                                                                )
-                                                                    .toString()
-                                                                    .replace(
-                                                                        /\B(?=(\d{3})+(?!\d))/g,
-                                                                        " "
-                                                                    )
-                                                                : "-"}
-                                                        </span>
-                                                    ) : (
-                                                        <span>
-                                                            {dataItem.value
+                                                    <span>
+                                                        {dataItem.value !==
+                                                            0
+                                                            ? Math.round(
+                                                                dataItem.value
+                                                            )
                                                                 .toString()
                                                                 .replace(
                                                                     /\B(?=(\d{3})+(?!\d))/g,
                                                                     " "
-                                                                )}
-                                                        </span>
-                                                    )}
+                                                                )
+                                                            : "-"}
+                                                    </span>
                                                 </div>
                                             </div>
                                         )
                                     })}
                                 </div>
                             )
-                        })}
-                    </div>
-                    <div style={styles.diagramWrap}>
-                        <Line
-                            data={energyСostsDiagram}
-                            options={{
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        font: {
-                                            size: 20,
-                                        },
-                                        text: "Затраты на э/э",
-                                    },
-                                },
-                            }}
-                        />
-                    </div>
+                        } else {
+                            return (
+                                <div
+                                    style={styles.finalTableBlock}
+                                    key={item.name}
+                                >
+                                    <div
+                                        style={styles.finalTableRow}
+                                        key={item.id}
+                                    >
+                                        <div style={styles.finalTableTitleCol}>
+                                            {item.name}
+                                        </div>
+                                    </div>
+                                    {item.data.map((dataItem, dataIndex) => {
+                                        return (
+                                            <div
+                                                style={styles.finalTableRow}
+                                                key={dataItem.id}
+                                            >
+                                                <div
+                                                    style={
+                                                        styles.finalTableLastCol1
+                                                    }
+                                                >
+                                                    {dataItem.name}
+                                                </div>
+                                                <div
+                                                    style={
+                                                        styles.finalTablePaybackCol2
+                                                    }
+                                                >
+
+                                                    <span style={
+                                                        dataIndex == 0 ? styles.finalTablePaybackSubtitle : styles.finalTablePaybackValue
+                                                    }>
+                                                        {dataItem.value1
+                                                            .toString()
+                                                            .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                " "
+                                                            )}
+                                                    </span>
+
+                                                    <span style={
+                                                        dataIndex == 0 ? styles.finalTablePaybackSubtitle : styles.finalTablePaybackValue
+                                                    }>
+                                                        {dataItem.value2
+                                                            .toString()
+                                                            .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                " "
+                                                            )}
+                                                    </span>
+
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )
+                        }
+
+                    })}
                 </div>
+                <div style={styles.diagramWrap}>
+                    <Line
+                        data={energyСostsDiagram}
+                        options={{
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    font: {
+                                        size: 20,
+                                    },
+                                    text: "Затраты на э/э",
+                                },
+                            },
+                        }}
+                    />
+                </div>
+
+                <Button
+                    type="button"
+                    onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = "#008ECF"
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = "#005CA9"
+                    }}
+                    style={styles.btn}
+                    onClick={() => printResult()}
+                >
+                    Распечатать рассчёт
+                </Button>
             </div>
-        </div>
-    )
+        )
+    }
 }
 
 /**********Статичные данные ******************/
@@ -2436,6 +3140,11 @@ const maintenance = {
 
 /**********Вспомогательные функции ****/
 
+//печать страницы
+function printResult() {
+    window.print();
+}
+
 //расчёт индексации тарифов
 function calculateIndexingArr(startPrice, indexing) {
     indexing = indexing / 100
@@ -2533,7 +3242,6 @@ function submitForm(userData, data1, data2) {
     if (!resultForm) return
 
     const inputs = resultForm.querySelectorAll("input")
-
 
     let inputCount = 0
 
